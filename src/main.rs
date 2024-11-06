@@ -78,15 +78,28 @@ pub enum AppSW {
     ClaNotSupported = 0x6E00,
     TxDisplayFail = 0xB001,
     AddrDisplayFail = 0xB002,
+    AmountDisplayFail = 0xB003,
     TxWrongLength = 0xB004,
     TxParsingFail = 0xB005,
     TxHashFail = 0xB006,
+    BadState = 0xB007,
     TxSignFail = 0xB008,
     KeyDeriveFail = 0xB009,
     VersionParsingFail = 0xB00A,
     WrongApduLength = StatusWords::BadLen as u16,
     Ok = 0x9000,
+    //
+    InvalidData = 0x6A80,
+    WrongDataLength = 0x6A87,
+    WrongResponseLength = 0xB000,
 }
+// To keep consistency with c version app-conflux 
+// Cip37ConversionFail = 0xB008
+// DisplayBip32PathFail = 0xB001
+#[allow(dead_code)]
+const APP_SW_CIP37_CONVERSION_FAIL: u16 = 0xB008;
+#[allow(dead_code)]
+const APP_SW_DISPLAY_BIP32_PATH_FAIL: u16 = 0xB001;
 
 impl From<AppSW> for Reply {
     fn from(sw: AppSW) -> Reply {
@@ -119,7 +132,7 @@ impl TryFrom<ApduHeader> for Instruction {
     /// [`sample_main`] to have this verification automatically performed by the SDK.
     fn try_from(value: ApduHeader) -> Result<Self, Self::Error> {
         match (value.ins, value.p1, value.p2) {
-            (3, 0, 0) => Ok(Instruction::GetVersion),
+            (1, 0, 0) => Ok(Instruction::GetVersion),
             (4, 0, 0) => Ok(Instruction::GetAppName),
             (5, 0 | 1, 0) => Ok(Instruction::GetPubkey {
                 display: value.p1 != 0,
@@ -135,7 +148,7 @@ impl TryFrom<ApduHeader> for Instruction {
                 chunk: 0,
                 more: false,
             }),
-            (3..=6, _, _) => Err(AppSW::WrongP1P2),
+            (3..=6, _, _) | (1, _, _) => Err(AppSW::WrongP1P2),
             (_, _, _) => Err(AppSW::InsNotSupported),
         }
     }

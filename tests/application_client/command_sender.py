@@ -25,7 +25,7 @@ class P2(IntEnum):
     P2_MORE = 0x80
 
 class InsType(IntEnum):
-    GET_VERSION    = 0x03
+    GET_VERSION    = 0x01
     GET_APP_NAME   = 0x04
     GET_PUBLIC_KEY = 0x05
     SIGN_TX        = 0x06

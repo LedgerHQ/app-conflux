@@ -16,12 +16,13 @@ def unpack_get_app_name_response(response: bytes) -> str:
     return response.decode("ascii")
 
 # Unpack from response:
-# response = MAJOR (1)
+# response = FLAG (1)
+#            MAJOR (1)
 #            MINOR (1)
 #            PATCH (1)
 def unpack_get_version_response(response: bytes) -> Tuple[int, int, int]:
-    assert len(response) == 3
-    major, minor, patch = unpack("BBB", response)
+    assert len(response) == 4
+    flag, major, minor, patch = unpack("BBBB", response)
     return (major, minor, patch)
 
 # Unpack from response:
