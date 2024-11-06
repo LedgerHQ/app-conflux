@@ -27,8 +27,8 @@ mod app_ui {
 mod handlers {
     pub mod get_public_key;
     pub mod get_version;
-    pub mod sign_tx;
     pub mod personal_sign;
+    pub mod sign_tx;
 }
 mod cfx_addr;
 mod consts;
@@ -40,8 +40,8 @@ use app_ui::menu::ui_menu_main;
 use handlers::{
     get_public_key::handler_get_public_key,
     get_version::handler_get_version,
-    sign_tx::{handler_sign_tx, TxContext},
     personal_sign::handler_personal_sign,
+    sign_tx::{handler_sign_tx, TxContext},
 };
 use ledger_device_sdk::io::{ApduHeader, Comm, Reply, StatusWords};
 #[cfg(feature = "pending_review_screen")]
@@ -93,7 +93,7 @@ pub enum AppSW {
     WrongDataLength = 0x6A87,
     WrongResponseLength = 0xB000,
 }
-// To keep consistency with c version app-conflux 
+// To keep consistency with c version app-conflux
 // Cip37ConversionFail = 0xB008
 // DisplayBip32PathFail = 0xB001
 #[allow(dead_code)]
@@ -111,9 +111,18 @@ impl From<AppSW> for Reply {
 pub enum Instruction {
     GetVersion,
     GetAppName,
-    GetPubkey { display: bool },
-    SignTx { chunk: u8, more: bool },
-    PersonalSign { chunk: u8, more: bool },
+    GetPubkey {
+        display: bool,
+        return_chain_code: bool,
+    },
+    SignTx {
+        chunk: u8,
+        more: bool,
+    },
+    PersonalSign {
+        chunk: u8,
+        more: bool,
+    },
 }
 
 impl TryFrom<ApduHeader> for Instruction {
@@ -133,10 +142,12 @@ impl TryFrom<ApduHeader> for Instruction {
     fn try_from(value: ApduHeader) -> Result<Self, Self::Error> {
         match (value.ins, value.p1, value.p2) {
             (1, 0, 0) => Ok(Instruction::GetVersion),
-            (4, 0, 0) => Ok(Instruction::GetAppName),
-            (5, 0 | 1, 0) => Ok(Instruction::GetPubkey {
+            (2, 0 | 1, 0 | 1) => Ok(Instruction::GetPubkey {
                 display: value.p1 != 0,
+                return_chain_code: value.p2 != 0,
             }),
+            (4, 0, 0) => Ok(Instruction::GetAppName),
+
             (6, P1_SIGN_TX_START, P2_SIGN_TX_MORE)
             | (6, 1..=P1_SIGN_TX_MAX, P2_SIGN_TX_LAST | P2_SIGN_TX_MORE) => {
                 Ok(Instruction::SignTx {
@@ -144,11 +155,11 @@ impl TryFrom<ApduHeader> for Instruction {
                     more: value.p2 == P2_SIGN_TX_MORE,
                 })
             }
-            (7, 0, 0) => Ok(Instruction::PersonalSign{
+            (7, 0, 0) => Ok(Instruction::PersonalSign {
                 chunk: 0,
                 more: false,
             }),
-            (3..=6, _, _) | (1, _, _) => Err(AppSW::WrongP1P2),
+            (1..=6, _, _) => Err(AppSW::WrongP1P2),
             (_, _, _) => Err(AppSW::InsNotSupported),
         }
     }
@@ -232,8 +243,11 @@ fn handle_apdu(comm: &mut Comm, ins: &Instruction, ctx: &mut TxContext) -> Resul
             Ok(())
         }
         Instruction::GetVersion => handler_get_version(comm),
-        Instruction::GetPubkey { display } => handler_get_public_key(comm, *display),
+        Instruction::GetPubkey {
+            display,
+            return_chain_code,
+        } => handler_get_public_key(comm, *display, *return_chain_code),
         Instruction::SignTx { chunk, more } => handler_sign_tx(comm, *chunk, *more, ctx),
-        Instruction::PersonalSign {chunk: _, more: _} => handler_personal_sign(),
+        Instruction::PersonalSign { chunk: _, more: _ } => handler_personal_sign(),
     }
 }

@@ -31,9 +31,9 @@ use ledger_device_sdk::nbgl::{NbglAddressReview, NbglGlyph};
 #[cfg(any(target_os = "stax", target_os = "flex"))]
 use include_gif::include_gif;
 
-pub fn ui_display_pk(addr: &[u8]) -> Result<bool, AppSW> {
+pub fn ui_display_pk(addr: &[u8], chain_id: u32) -> Result<bool, AppSW> {
     let addr = &addr[addr.len() - ADDRRESS_BYTES_LEN..]; // last 20 bytes
-    let network = Network::from_network_id(1029);
+    let network = Network::from_network_id(chain_id as u64);
     let cfx_addr = cfx_addr_encode(addr, network).map_err(|_e| AppSW::AddrDisplayFail)?;
 
     #[cfg(not(any(target_os = "stax", target_os = "flex")))]

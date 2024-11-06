@@ -27,7 +27,7 @@ def test_get_public_key_confirm_accepted(backend, scenario_navigator):
     client = ConfluxCommandSender(backend)
     path = "m/44'/1'/0'/0/0"
     
-    with client.get_public_key_with_confirmation(path=path):
+    with client.get_public_key_with_confirmation(path=path, chain_id=1029):
         scenario_navigator.address_review_approve()
         
     response = client.get_async_response().data
@@ -43,7 +43,7 @@ def test_get_public_key_confirm_refused(backend, scenario_navigator):
     path = "m/44'/1'/0'/0/0"
 
     with pytest.raises(ExceptionRAPDU) as e:
-        with client.get_public_key_with_confirmation(path=path):
+        with client.get_public_key_with_confirmation(path=path, chain_id=1029):
             scenario_navigator.address_review_reject()
 
     # Assert that we have received a refusal

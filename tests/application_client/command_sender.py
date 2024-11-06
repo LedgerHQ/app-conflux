@@ -23,11 +23,13 @@ class P2(IntEnum):
     P2_LAST = 0x00
     # Parameter 2 for more APDU to receive.
     P2_MORE = 0x80
+    
+    P2_TRUE = 0x01
 
 class InsType(IntEnum):
     GET_VERSION    = 0x01
+    GET_PUBLIC_KEY = 0x02
     GET_APP_NAME   = 0x04
-    GET_PUBLIC_KEY = 0x05
     SIGN_TX        = 0x06
 
 class Errors(IntEnum):
@@ -84,17 +86,17 @@ class ConfluxCommandSender:
         return self.backend.exchange(cla=CLA,
                                      ins=InsType.GET_PUBLIC_KEY,
                                      p1=P1.P1_START,
-                                     p2=P2.P2_LAST,
+                                     p2=P2.P2_TRUE,
                                      data=pack_derivation_path(path))
 
 
     @contextmanager
-    def get_public_key_with_confirmation(self, path: str) -> Generator[None, None, None]:
+    def get_public_key_with_confirmation(self, path: str, chain_id: int) -> Generator[None, None, None]:
         with self.backend.exchange_async(cla=CLA,
                                          ins=InsType.GET_PUBLIC_KEY,
                                          p1=P1.P1_CONFIRM,
-                                         p2=P2.P2_LAST,
-                                         data=pack_derivation_path(path)) as response:
+                                         p2=P2.P2_TRUE,
+                                         data=pack_derivation_path(path) + chain_id.to_bytes(4, 'big')) as response:
             yield response
 
 

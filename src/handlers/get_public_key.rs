@@ -23,8 +23,20 @@ use ledger_device_sdk::ecc::{Secp256k1, SeedDerive};
 use ledger_device_sdk::hash::{sha3::Keccak256, HashInit};
 use ledger_device_sdk::io::Comm;
 
-pub fn handler_get_public_key(comm: &mut Comm, display: bool) -> Result<(), AppSW> {
-    let data = comm.get_data().map_err(|_| AppSW::WrongApduLength)?;
+pub fn handler_get_public_key(
+    comm: &mut Comm,
+    display: bool,
+    return_chain_code: bool,
+) -> Result<(), AppSW> {
+    let mut chain_id: u32 = 0;
+    let mut data = comm.get_data().map_err(|_| AppSW::WrongApduLength)?;
+
+    // Extract chain id if display is requested (last 4 bytes are chain id)
+    if display {
+        chain_id = u32::from_be_bytes(data[data.len() - 4..].try_into().unwrap());
+        data = &data[..data.len() - 4];
+    }
+
     let path: Bip32Path = data.try_into()?;
 
     let (k, cc) = Secp256k1::derive_from(path.as_ref());
@@ -41,7 +53,7 @@ pub fn handler_get_public_key(comm: &mut Comm, display: bool) -> Result<(), AppS
         address[HASH_BYTES_LEN - ADDRRESS_BYTES_LEN] &= 0x0f;
         address[HASH_BYTES_LEN - ADDRRESS_BYTES_LEN] |= 0x10;
 
-        if !ui_display_pk(&address)? {
+        if !ui_display_pk(&address, chain_id)? {
             return Err(AppSW::Deny);
         }
     }
@@ -49,6 +61,9 @@ pub fn handler_get_public_key(comm: &mut Comm, display: bool) -> Result<(), AppS
     comm.append(&[pk.pubkey.len() as u8]);
     comm.append(&pk.pubkey);
 
+    if !return_chain_code {
+        return Ok(());
+    }
     const CHAINCODE_LEN: u8 = 32;
     let code = cc.unwrap();
     comm.append(&[CHAINCODE_LEN]);
