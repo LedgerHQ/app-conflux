@@ -1,6 +1,6 @@
 /*****************************************************************************
  *   Ledger App Conflux Rust.
- *   (c) 2023 Ledger SAS.
+ *   (c) 2023 Conflux Foundation.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ pub fn ui_menu_main(_: &mut Comm) -> NbglHomeAndSettings {
     // Load glyph from 64x64 4bpp gif file with include_gif macro. Creates an NBGL compatible glyph.
     const FERRIS: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
 
-    let settings_strings = [["Display Memo", "Allow display of transaction data."]];
+    let settings_strings = [["Display Data", "Allow display of transaction data."]];
     let mut settings: Settings = Default::default();
 
     // Display the home screen.

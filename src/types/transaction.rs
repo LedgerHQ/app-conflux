@@ -1,5 +1,4 @@
 use alloc::vec::Vec;
-use bytes::Bytes;
 use ethereum_types::{Address, H256, U256};
 use rlp::{Decodable, DecoderError, Encodable, Rlp, RlpDecodable, RlpEncodable, RlpStream};
 
@@ -15,7 +14,7 @@ pub struct Transaction {
     pub to: Address,
     pub value: U256,
     pub nonce: u64,
-    pub data: Bytes,
+    pub data: Vec<u8>,
     pub gas: u64,
     pub gas_price: Option<U256>,
     pub storage_limit: u64,
