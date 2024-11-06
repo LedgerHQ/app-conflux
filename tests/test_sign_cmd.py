@@ -5,7 +5,7 @@ from application_client.command_sender import ConfluxCommandSender, Errors
 from application_client.response_unpacker import unpack_get_public_key_response, unpack_sign_tx_response
 from ragger.error import ExceptionRAPDU
 from ragger.navigator import NavIns, NavInsID
-from utils import ROOT_SCREENSHOT_PATH, check_signature_validity
+from utils import ROOT_SCREENSHOT_PATH, check_signature_validity, check_personal_signature_validity
 from web3 import Web3
 from cfx_address import Base32Address
 
@@ -37,8 +37,6 @@ def test_sign_tx_short_tx(backend, scenario_navigator, firmware, navigator):
         data="".encode("utf-8")
     ).serialize()
 
-    print(transaction)
-    
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
@@ -176,3 +174,38 @@ def test_sign_tx_refused(backend, scenario_navigator):
     # Assert that we have received a refusal
     assert e.value.status == Errors.SW_DENY
     assert len(e.value.data) == 0
+
+# In this test a transaction is sent to the device to be signed and validated on screen.
+# The transaction is short and will be sent in one chunk.
+# We will ensure that the displayed information is correct by using screenshots comparison.
+def test_personal_sign(backend, scenario_navigator, firmware, navigator):
+    # Use the app interface instead of raw interface
+    client = ConfluxCommandSender(backend)
+    # The path used for this entire test
+    path: str = "m/44'/1'/0'/0/0"
+
+    # First we need to get the public key of the device in order to build the transaction
+    rapdu = client.get_public_key(path=path)
+    _, public_key, _, _ = unpack_get_public_key_response(rapdu.data)
+
+    msg = "Hello, world!".encode("utf-8")
+
+    # Enable display of transaction data (NBGL devices only)
+    if not firmware.device.startswith("nano"):
+        navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
+                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
+                            screen_change_before_first_instruction=False,
+                            screen_change_after_last_instruction=False)
+
+    # Send the sign device instruction.
+    # As it requires on-screen validation, the function is asynchronous.
+    # It will yield the result when the navigation is done
+    with client.personal_sign(path=path, data=msg):
+        # Validate the on-screen request by performing the navigation appropriate for this device
+        scenario_navigator.review_approve()
+
+    # The device as yielded the result, parse it and ensure that the signature is correct
+    response = client.get_async_response().data
+    _, der_sig, _ = unpack_sign_tx_response(response)
+    assert check_personal_signature_validity(public_key, der_sig, msg)

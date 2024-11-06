@@ -146,20 +146,22 @@ impl TryFrom<ApduHeader> for Instruction {
                 display: value.p1 != 0,
                 return_chain_code: value.p2 != 0,
             }),
-            (4, 0, 0) => Ok(Instruction::GetAppName),
-
-            (6, P1_SIGN_TX_START, P2_SIGN_TX_MORE)
-            | (6, 1..=P1_SIGN_TX_MAX, P2_SIGN_TX_LAST | P2_SIGN_TX_MORE) => {
+            (3, P1_SIGN_TX_START, P2_SIGN_TX_MORE)
+            | (3, 1..=P1_SIGN_TX_MAX, P2_SIGN_TX_LAST | P2_SIGN_TX_MORE) => {
                 Ok(Instruction::SignTx {
                     chunk: value.p1,
                     more: value.p2 == P2_SIGN_TX_MORE,
                 })
             }
-            (7, 0, 0) => Ok(Instruction::PersonalSign {
-                chunk: 0,
-                more: false,
-            }),
-            (1..=6, _, _) => Err(AppSW::WrongP1P2),
+            (4, P1_SIGN_TX_START, P2_SIGN_TX_MORE)
+            | (4, 1..=P1_SIGN_TX_MAX, P2_SIGN_TX_LAST | P2_SIGN_TX_MORE) => {
+                Ok(Instruction::PersonalSign {
+                    chunk: value.p1,
+                    more: value.p2 == P2_SIGN_TX_MORE,
+                })
+            }
+            (5, 0, 0) => Ok(Instruction::GetAppName),
+            (1..=5, _, _) => Err(AppSW::WrongP1P2),
             (_, _, _) => Err(AppSW::InsNotSupported),
         }
     }
@@ -248,6 +250,8 @@ fn handle_apdu(comm: &mut Comm, ins: &Instruction, ctx: &mut TxContext) -> Resul
             return_chain_code,
         } => handler_get_public_key(comm, *display, *return_chain_code),
         Instruction::SignTx { chunk, more } => handler_sign_tx(comm, *chunk, *more, ctx),
-        Instruction::PersonalSign { chunk: _, more: _ } => handler_personal_sign(),
+        Instruction::PersonalSign { chunk, more } => {
+            handler_personal_sign(comm, *chunk, *more, ctx)
+        }
     }
 }

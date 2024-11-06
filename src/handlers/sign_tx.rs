@@ -15,6 +15,7 @@
  *  limitations under the License.
  *****************************************************************************/
 use crate::app_ui::sign::ui_display_tx;
+use crate::consts::MAX_TRANSACTION_LEN;
 use crate::types::Transaction;
 use crate::utils::Bip32Path;
 use crate::AppSW;
@@ -27,12 +28,10 @@ use rlp::decode;
 #[cfg(any(target_os = "stax", target_os = "flex"))]
 use ledger_device_sdk::nbgl::NbglHomeAndSettings;
 
-const MAX_TRANSACTION_LEN: usize = 1024 * 2; // 2KB
-
 pub struct TxContext {
-    raw_tx: Vec<u8>,
-    path: Bip32Path,
-    review_finished: bool,
+    pub raw_tx: Vec<u8>,
+    pub path: Bip32Path,
+    pub review_finished: bool,
     #[cfg(any(target_os = "stax", target_os = "flex"))]
     pub home: NbglHomeAndSettings,
 }
@@ -55,7 +54,7 @@ impl TxContext {
         self.review_finished
     }
     // Implement reset for TxInfo
-    fn reset(&mut self) {
+    pub fn reset(&mut self) {
         self.raw_tx.clear();
         self.path = Default::default();
         self.review_finished = false;

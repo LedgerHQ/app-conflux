@@ -29,8 +29,9 @@ class P2(IntEnum):
 class InsType(IntEnum):
     GET_VERSION    = 0x01
     GET_PUBLIC_KEY = 0x02
-    GET_APP_NAME   = 0x04
-    SIGN_TX        = 0x06
+    SIGN_TX        = 0x03
+    PERSONAL_SIGN  = 0x04
+    GET_APP_NAME   = 0x05
 
 class Errors(IntEnum):
     SW_DENY                    = 0x6985
@@ -58,12 +59,12 @@ class ConfluxCommandSender:
         self.backend = backend
 
 
-    def get_app_and_version(self) -> RAPDU:
-        return self.backend.exchange(cla=0xB0,  # specific CLA for BOLOS
-                                     ins=0x01,  # specific INS for get_app_and_version
-                                     p1=P1.P1_START,
-                                     p2=P2.P2_LAST,
-                                     data=b"")
+    # def get_app_and_version(self) -> RAPDU:
+    #     return self.backend.exchange(cla=0xB0,  # specific CLA for BOLOS
+    #                                  ins=0x01,  # specific INS for get_app_and_version
+    #                                  p1=P1.P1_START,
+    #                                  p2=P2.P2_LAST,
+    #                                  data=b"")
 
 
     def get_version(self) -> RAPDU:
@@ -120,6 +121,31 @@ class ConfluxCommandSender:
 
         with self.backend.exchange_async(cla=CLA,
                                          ins=InsType.SIGN_TX,
+                                         p1=idx,
+                                         p2=P2.P2_LAST,
+                                         data=messages[-1]) as response:
+            yield response
+
+    @contextmanager
+    def personal_sign(self, path: str, data: bytes) -> Generator[None, None, None]:
+        self.backend.exchange(cla=CLA,
+                              ins=InsType.PERSONAL_SIGN,
+                              p1=P1.P1_START,
+                              p2=P2.P2_MORE,
+                              data=pack_derivation_path(path))
+        messages = split_message(data, MAX_APDU_LEN)
+        idx: int = P1.P1_START + 1
+
+        for msg in messages[:-1]:
+            self.backend.exchange(cla=CLA,
+                                  ins=InsType.PERSONAL_SIGN,
+                                  p1=idx,
+                                  p2=P2.P2_MORE,
+                                  data=msg)
+            idx += 1
+
+        with self.backend.exchange_async(cla=CLA,
+                                         ins=InsType.PERSONAL_SIGN,
                                          p1=idx,
                                          p2=P2.P2_LAST,
                                          data=messages[-1]) as response:

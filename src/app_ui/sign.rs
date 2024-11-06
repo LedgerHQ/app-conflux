@@ -14,6 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *****************************************************************************/
+use crate::cfx_addr::{cfx_addr_encode, Network};
 use crate::types::Transaction;
 use crate::AppSW;
 
@@ -41,7 +42,8 @@ use alloc::format;
 /// * `tx` - Transaction to be displayed for validation
 pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
     let value_str = format!("{} {}", "CFX", tx.value); // TODO convert Drip to CFX
-    let to_str = format!("0x{}", hex::encode(tx.to).to_uppercase());
+    let network = Network::from_network_id(tx.chain_id);
+    let to_str = cfx_addr_encode(tx.to.as_ref(), network).map_err(|_e| AppSW::AddrDisplayFail)?;
     let data_str = format!("0x{}", hex::encode(tx.data.clone()).to_uppercase());
 
     // Define transaction review fields
@@ -97,5 +99,44 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
         } else {
             Ok(review.show(&my_fields))
         }
+    }
+}
+
+pub fn ui_display_msg(msg: &[u8]) -> Result<bool, AppSW> {
+    let msg_str = core::str::from_utf8(msg).map_err(|_| AppSW::InvalidData)?;
+
+    // Define transaction review fields
+    let my_fields = [Field {
+        name: "Message",
+        value: msg_str,
+    }];
+
+    // Create transaction review
+    #[cfg(not(any(target_os = "stax", target_os = "flex")))]
+    {
+        let my_review = MultiFieldReview::new(
+            &my_fields,
+            &["Review ", "Message"],
+            Some(&EYE),
+            "Approve",
+            Some(&VALIDATE_14),
+            "Reject",
+            Some(&CROSSMARK),
+        );
+
+        Ok(my_review.show())
+    }
+
+    #[cfg(any(target_os = "stax", target_os = "flex"))]
+    {
+        // Load glyph from 64x64 4bpp gif file with include_gif macro. Creates an NBGL compatible glyph.
+        const FERRIS: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
+        // Create NBGL review. Maximum number of fields and string buffer length can be customised
+        // with constant generic parameters of NbglReview. Default values are 32 and 1024 respectively.
+        let review: NbglReview = NbglReview::new()
+            .titles("Review message", "", "Sign message")
+            .glyph(&FERRIS);
+
+        Ok(review.show(&my_fields))
     }
 }

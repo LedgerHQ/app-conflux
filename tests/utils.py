@@ -9,6 +9,7 @@ from ecdsa.util import sigdecode_der
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
+PREFIX = b"\x19Conflux Signed Message:\n"
 
 # Check if a signature of a given message is valid
 def check_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
@@ -17,6 +18,19 @@ def check_signature_validity(public_key: bytes, signature: bytes, message: bytes
         curve=SECP256k1,
         hashfunc=sha256
     )
+    return pk.verify(signature=signature,
+                     data=message,
+                     hashfunc=keccak_256,
+                     sigdecode=sigdecode_der)
+
+# Check if a signature of a given message is valid
+def check_personal_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
+    pk: VerifyingKey = VerifyingKey.from_string(
+        public_key,
+        curve=SECP256k1,
+        hashfunc=sha256
+    )
+    message = PREFIX + str(len(message)).encode() + message
     return pk.verify(signature=signature,
                      data=message,
                      hashfunc=keccak_256,
