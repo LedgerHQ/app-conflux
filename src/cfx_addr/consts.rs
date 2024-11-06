@@ -1,6 +1,3 @@
-use alloc::{format, string::String, vec::Vec};
-use lazy_static::lazy_static;
-
 pub const CHARSET_SIZE: usize = 32;
 
 pub const RESERVED_BITS_MASK: u8 = 0xf8;
@@ -32,6 +29,10 @@ pub const SIZE_512: u8 = 0x07;
 
 pub const BASE32_CHARS: &str = "abcdefghijklmnopqrstuvwxyz0123456789";
 pub const EXCLUDE_CHARS: [char; 4] = ['o', 'i', 'l', 'q'];
+pub const CHARSET: [char; 32] = [
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'r', 's', 't', 'u', 'v', 'w',
+    'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+]; // chars excluding 'oilq'
 
 // network prefix
 pub const MAINNET_PREFIX: &str = "cfx";
@@ -47,31 +48,3 @@ pub const ADDRESS_TYPE_USER: &'static str = "user";
 
 // These two network_ids are reserved.
 pub const RESERVED_NETWORK_IDS: [u64; 2] = [1, 1029];
-
-lazy_static! {
-    // Regular expression for application to match string. This regex isn't strict,
-    // because our SDK will.
-    // "(?i)[:=_-0123456789abcdefghijklmnopqrstuvwxyz]*"
-    pub static ref REGEXP: String = format!{"(?i)[:=_-{}]*", BASE32_CHARS};
-
-    // For encoding.
-    pub static ref CHARSET: Vec<u8> =
-        // Remove EXCLUDE_CHARS from charset.
-        BASE32_CHARS.replace(&EXCLUDE_CHARS[..], "").into_bytes();
-
-    // For decoding.
-    pub static ref CHAR_INDEX: [Option<u8>; 128] = (|| {
-        let mut index = [None; 128];
-        assert_eq!(CHARSET.len(), CHARSET_SIZE);
-        for i in 0..CHARSET_SIZE {
-            let c = CHARSET[i] as usize;
-            index[c] = Some(i as u8);
-            // Support uppercase as well.
-            let u = (c as u8 as char).to_ascii_uppercase() as u8 as usize;
-            if u != c {
-                index[u] = Some(i as u8);
-            }
-        }
-        return index;
-    }) ();
-}
