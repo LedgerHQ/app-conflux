@@ -75,14 +75,14 @@ pub fn ui_menu_main(comm: &mut Comm) -> Event<Instruction> {
 #[cfg(any(target_os = "stax", target_os = "flex"))]
 pub fn ui_menu_main(_: &mut Comm) -> NbglHomeAndSettings {
     // Load glyph from 64x64 4bpp gif file with include_gif macro. Creates an NBGL compatible glyph.
-    const FERRIS: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
+    const CFX: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
 
     let settings_strings = [["Display Data", "Allow display of transaction data."]];
     let mut settings: Settings = Default::default();
 
     // Display the home screen.
     NbglHomeAndSettings::new()
-        .glyph(&FERRIS)
+        .glyph(&CFX)
         .settings(settings.get_mut(), &settings_strings)
         .infos(
             "Conflux",

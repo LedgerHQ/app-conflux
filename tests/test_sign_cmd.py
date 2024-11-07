@@ -18,7 +18,7 @@ def test_sign_tx_short_tx(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/44'/1'/0'/0/0"
+    path: str = "m/503'/1'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -68,7 +68,7 @@ def test_sign_tx_short_tx_no_memo(backend, scenario_navigator, firmware):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/44'/1'/0'/0/0"
+    path: str = "m/503'/1'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -108,7 +108,7 @@ def test_sign_tx_short_tx_no_memo(backend, scenario_navigator, firmware):
 def test_sign_tx_long_tx(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
-    path: str = "m/44'/1'/0'/0/0"
+    path: str = "m/503'/1'/0'/0/0"
 
     rapdu = client.get_public_key(path=path)
     _, public_key, _, _ = unpack_get_public_key_response(rapdu.data)
@@ -150,7 +150,7 @@ def test_sign_tx_long_tx(backend, scenario_navigator, firmware, navigator):
 def test_sign_tx_refused(backend, scenario_navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
-    path: str = "m/44'/1'/0'/0/0"
+    path: str = "m/503'/1'/0'/0/0"
 
     rapdu = client.get_public_key(path=path)
     _, pub_key, _, _ = unpack_get_public_key_response(rapdu.data)
@@ -175,14 +175,13 @@ def test_sign_tx_refused(backend, scenario_navigator):
     assert e.value.status == Errors.SW_DENY
     assert len(e.value.data) == 0
 
-# In this test a transaction is sent to the device to be signed and validated on screen.
-# The transaction is short and will be sent in one chunk.
-# We will ensure that the displayed information is correct by using screenshots comparison.
 def test_personal_sign(backend, scenario_navigator, firmware, navigator):
+    if not firmware.device.startswith("nano"):
+        pytest.skip("Skipping this test for None Nano devices")
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/44'/1'/0'/0/0"
+    path: str = "m/503'/1'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -190,7 +189,7 @@ def test_personal_sign(backend, scenario_navigator, firmware, navigator):
 
     msg = "Hello, world!".encode("utf-8")
 
-    # Enable display of transaction data (NBGL devices only)
+    # Enable display of message data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
                             NavIns(NavInsID.TOUCH, (200, 113)),

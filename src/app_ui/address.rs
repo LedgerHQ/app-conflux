@@ -59,10 +59,10 @@ pub fn ui_display_pk(addr: &[u8], chain_id: u32) -> Result<bool, AppSW> {
     #[cfg(any(target_os = "stax", target_os = "flex"))]
     {
         // Load glyph from 64x64 4bpp gif file with include_gif macro. Creates an NBGL compatible glyph.
-        const FERRIS: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
+        const CFX: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
         // Display the address confirmation screen.
         Ok(NbglAddressReview::new()
-            .glyph(&FERRIS)
+            .glyph(&CFX)
             .verify_str("Verify CFX address")
             .show(&cfx_addr))
     }
