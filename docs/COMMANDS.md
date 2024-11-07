@@ -112,8 +112,8 @@ Notice the chain ID (`0x00000405 ~ 1029`, aka mainnet) at the end.
 
 | CLA  | INS  | P1                                      | P2   | Lc       | Le       |
 | ---- | ---- | --------------------------------------- | ---- | -------- | -------- |
-| `e0` | `03` | `00`: first transaction data block      | `00` | variable | variable |
-|      |      | `80`: subsequent transaction data block |      |          |          |
+| `e0` | `03` | `00`: first data block      | `08` more | variable | variable |
+|      |      | `01`-`03`: subsequent data block index |  `00` last    |          |          |
 
 ##### Request payload
 
@@ -125,7 +125,6 @@ First data block:
 | First derivation index (big endian)              | 4      |
 | ...                                              | 4      |
 | Last derivation index (big endian)               | 4      |
-| RLP data chunk                                   | var    |
 
 Subsequent data blocks:
 
@@ -137,19 +136,27 @@ Subsequent data blocks:
 
 | Description | Length |
 | ----------- | ------ |
-| v           | 1      |
-| r           | 32     |
-| s           | 32     |
+| sig len           | 1      |
+| der_sig           | var    |
+| v(parity)         | 1      |
 
 #### Examples
 
-**Command**: `e003000041058000002c800001f7800000000000000000000000eb1284561f61b9831e84809410109fc8df283027b6285cc889f5aa624eac1f55843b9aca0081800182040580`
+**Command**: `e003000041058000002c800001f7800000000000000000000000`
 
 | CLA    | INS    | P1     | P2     | Lc     | Le                                                                                                                                                       |
 | ------ | ------ | ------ | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `0xe0` | `0x03` | `0x00` | `0x00` | `0x41` | `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000 0xeb1284561f61b9831e84809410109fc8df283027b6285cc889f5aa624eac1f55843b9aca0081800182040580` |
+| `0xe0` | `0x03` | `0x00` | `0x08` | `0x15` | `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000` |
 
 `44'/503'/0'/0/0` is encoded as `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000`.
+
+**Command**: `eb1284561f61b9831e84809410109fc8df283027b6285cc889f5aa624eac1f55843b9aca0081800182040580`
+
+| CLA    | INS    | P1     | P2     | Lc     | Le                                                                                                                                                       |
+| ------ | ------ | ------ | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0xe0` | `0x03` | `0x01` | `0x00` | `0x2c` | `0xeb1284561f61b9831e84809410109fc8df283027b6285cc889f5aa624eac1f55843b9aca0081800182040580` |
+
+
 
 `0xeb1284561f61b9831e84809410109fc8df283027b6285cc889f5aa624eac1f55843b9aca0081800182040580` is the RLP encoded list `["0x12", "0x561f61b9", "0x1e8480", "0x10109fC8DF283027b6285cc889F5aA624EaC1F55", "0x3b9aca00", "0x80", "0x1", "0x405", "0x"]` which represents the following transaction:
 
@@ -187,7 +194,9 @@ The same transaction sent in two chunks:
 | ------ | ------ | ------ | ------ | ------ | ------------------------------------------------ |
 | `0xe0` | `0x03` | `0x80` | `0x00` | `0x16` | `0x5cc889f5aa624eac1f55843b9aca0081800182040580` |
 
-**Response**: `00 f9071161c2dbc19dabf54d14d42944cecacf61943a9898f4f64c8aa6d23a58b6 64ea364f092d23d7a94388f2f43cf54a86fe644d221e822210fde413d406ebb6 9000`
+**Outdated format Response(v r s)**: `00 f9071161c2dbc19dabf54d14d42944cecacf61943a9898f4f64c8aa6d23a58b6 64ea364f092d23d7a94388f2f43cf54a86fe644d221e822210fde413d406ebb6 9000`
+
+**Response**: to be added
 
 ## SIGN_PERSONAL
 
@@ -195,8 +204,8 @@ The same transaction sent in two chunks:
 
 | CLA  | INS  | P1                          | P2   | Lc       | Le       |
 | ---- | ---- | --------------------------- | ---- | -------- | -------- |
-| `e0` | `04` | `00`: first data block      | `00` | variable | variable |
-|      |      | `80`: subsequent data block |      |          |          |
+| `e0` | `04` | `00`: first data block      | `08` more data | variable | variable |
+|      |      | `01`-`03`: subsequent data block index | `00` last     |          |          |
 
 ##### Request payload
 
@@ -208,9 +217,6 @@ First data block:
 | First derivation index (big endian)              | 4      |
 | ...                                              | 4      |
 | Last derivation index (big endian)               | 4      |
-| Chain ID                                         | 4      |
-| Message length                                   | 4      |
-| Message chunk                                    | var    |
 
 Subsequent data blocks:
 
@@ -228,17 +234,19 @@ Subsequent data blocks:
 
 #### Examples
 
-**Command**: `e00400002a058000002c800001f7800000000000000000000000000004050000000d48656c6c6f2c20776f726c6421`
+**Command**: `e00400002a058000002c800001f7800000000000000000000000`
 
 | CLA    | INS    | P1     | P2     | Lc     | Le                                                                                                               |
 | ------ | ------ | ------ | ------ | ------ | ---------------------------------------------------------------------------------------------------------------- |
-| `0xe0` | `0x04` | `0x00` | `0x00` | `0x2a` | `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000 0x00000405 0x0000000d 0x48656c6c6f2c20776f726c6421` |
+| `0xe0` | `0x04` | `0x00` | `0x08` | `0x15` | `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000` |
 
 `44'/503'/0'/0/0` is encoded as `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000`.
 
-`0x00000405` stands for chain ID 1029 (Conflux mainnet).
+**Command**: `48656c6c6f2c20776f726c6421`
 
-`0x0000000d` is the length of the subsequent message (13 bytes).
+| CLA    | INS    | P1     | P2     | Lc     | Le                                                                                                               |
+| ------ | ------ | ------ | ------ | ------ | ---------------------------------------------------------------------------------------------------------------- |
+| `0xe0` | `0x04` | `0x01` | `0x00` | `0x0d` | `0x48656c6c6f2c20776f726c6421` |
 
 `0x48656c6c6f2c20776f726c6421` is the message `"Hello, world!"` hex-encoded.
 
