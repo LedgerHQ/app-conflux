@@ -2,7 +2,7 @@ import pytest
 
 from application_client.transaction import Transaction
 from application_client.command_sender import ConfluxCommandSender, Errors
-from application_client.response_unpacker import unpack_get_public_key_response, unpack_sign_tx_response
+from application_client.response_unpacker import unpack_get_public_key_response, unpack_sign_tx_response, unpack_vrs_response
 from ragger.error import ExceptionRAPDU
 from ragger.navigator import NavIns, NavInsID
 from utils import ROOT_SCREENSHOT_PATH, check_signature_validity, check_personal_signature_validity
@@ -207,5 +207,5 @@ def test_personal_sign(backend, scenario_navigator, firmware, navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
+    _, der_sig, _ = unpack_vrs_response(response)
     assert check_personal_signature_validity(public_key, der_sig, msg)

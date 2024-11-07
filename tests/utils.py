@@ -4,7 +4,7 @@ from sha3 import keccak_256
 
 from ecdsa.curves import SECP256k1
 from ecdsa.keys import VerifyingKey
-from ecdsa.util import sigdecode_der
+from ecdsa.util import sigdecode_der, sigdecode_string
 
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
@@ -24,6 +24,7 @@ def check_signature_validity(public_key: bytes, signature: bytes, message: bytes
                      sigdecode=sigdecode_der)
 
 # Check if a signature of a given message is valid
+# signature is r+s (not der encoded)
 def check_personal_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
     pk: VerifyingKey = VerifyingKey.from_string(
         public_key,
@@ -34,4 +35,4 @@ def check_personal_signature_validity(public_key: bytes, signature: bytes, messa
     return pk.verify(signature=signature,
                      data=message,
                      hashfunc=keccak_256,
-                     sigdecode=sigdecode_der)
+                     sigdecode=sigdecode_string)

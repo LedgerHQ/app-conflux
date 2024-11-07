@@ -106,13 +106,13 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
 pub fn ui_display_msg(msg: &[u8]) -> Result<bool, AppSW> {
     let msg_str = core::str::from_utf8(msg).map_err(|_| AppSW::InvalidData)?;
 
-    // Define transaction review fields
+    // Define message review fields
     let my_fields = [Field {
         name: "Message",
         value: msg_str,
     }];
 
-    // Create transaction review
+    // Create message review
     #[cfg(not(any(target_os = "stax", target_os = "flex")))]
     {
         let my_review = MultiFieldReview::new(

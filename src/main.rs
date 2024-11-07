@@ -32,6 +32,7 @@ mod handlers {
 }
 mod cfx_addr;
 mod consts;
+mod crypto;
 mod types;
 
 mod settings;
