@@ -170,9 +170,13 @@ impl TryFrom<ApduHeader> for Instruction {
 #[cfg(any(target_os = "stax", target_os = "flex"))]
 fn show_status_and_home_if_needed(ins: &Instruction, tx_ctx: &mut TxContext, status: &AppSW) {
     let (show_status, status_type) = match (ins, status) {
-        (Instruction::GetPubkey { display: true, return_chain_code: _ }, AppSW::Deny | AppSW::Ok) => {
-            (true, StatusType::Address)
-        }
+        (
+            Instruction::GetPubkey {
+                display: true,
+                return_chain_code: _,
+            },
+            AppSW::Deny | AppSW::Ok,
+        ) => (true, StatusType::Address),
         (Instruction::SignTx { .. }, AppSW::Deny | AppSW::Ok) if tx_ctx.finished() => {
             (true, StatusType::Transaction)
         }
