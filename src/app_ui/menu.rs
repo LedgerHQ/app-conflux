@@ -39,7 +39,7 @@ use ledger_device_sdk::io::Event;
 #[cfg(not(any(target_os = "stax", target_os = "flex")))]
 fn ui_about_menu(comm: &mut Comm) -> Event<Instruction> {
     let pages = [
-        &Page::from((["Rust Conflux", "(c) 2024 Conflux"], true)),
+        &Page::from((["Conflux Core App", "(c) 2024 Conflux"], true)),
         &Page::from(("Back", &BACK)),
     ];
     loop {
