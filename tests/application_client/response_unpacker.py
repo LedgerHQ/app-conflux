@@ -22,7 +22,7 @@ def unpack_get_app_name_response(response: bytes) -> str:
 #            PATCH (1)
 def unpack_get_version_response(response: bytes) -> Tuple[int, int, int]:
     assert len(response) == 4
-    flag, major, minor, patch = unpack("BBBB", response)
+    _, major, minor, patch = unpack("BBBB", response)
     return (major, minor, patch)
 
 # Unpack from response:

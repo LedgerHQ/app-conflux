@@ -4,8 +4,8 @@ This is the Conflux Ledger device app, which is developed in Rust. This project 
 
 ## Work to be done
 
-1. Unit conversion in the tx show UI
+1. Unit conversion in the tx show UI ✅
 2. Setting read and write: c app is through action
-3. Icons for stax and flex
+3. Icons for stax and flex ✅
 4. More test cases
-5. Nanox rlp compile issue
+5. Nanox rlp compile issue: need manual impl rlp decode
