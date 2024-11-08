@@ -4,8 +4,6 @@ pub const ADDRRESS_BYTES_LEN: usize = 20;
 
 pub const HASH_BYTES_LEN: usize = 32;
 
-// #define APPNAME_LEN (sizeof(APPNAME) - 1)
-
 /**
  * Maximum length of MAJOR_VERSION || MINOR_VERSION || PATCH_VERSION.
  */
