@@ -2,10 +2,10 @@ import pytest
 
 from application_client.transaction import Transaction
 from application_client.command_sender import ConfluxCommandSender, Errors
-from application_client.response_unpacker import unpack_get_public_key_response, unpack_sign_tx_response, unpack_vrs_response
+from application_client.response_unpacker import unpack_get_public_key_response, unpack_vrs_response
 from ragger.error import ExceptionRAPDU
 from ragger.navigator import NavIns, NavInsID
-from utils import ROOT_SCREENSHOT_PATH, check_signature_validity, check_personal_signature_validity
+from utils import ROOT_SCREENSHOT_PATH, check_rs_signature_validity, check_rs_prefix_msg_signature_validity
 from web3 import Web3
 from cfx_address import Base32Address
 
@@ -58,8 +58,8 @@ def test_sign_tx_short_tx(backend, scenario_navigator, firmware, navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_signature_validity(public_key, sig, transaction)
 
 def test_sign_tx_1gwei(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
@@ -101,8 +101,8 @@ def test_sign_tx_1gwei(backend, scenario_navigator, firmware, navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_signature_validity(public_key, sig, transaction)
 
 def test_sign_tx_very_big_value(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
@@ -144,8 +144,8 @@ def test_sign_tx_very_big_value(backend, scenario_navigator, firmware, navigator
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_signature_validity(public_key, sig, transaction)
 
 def test_sign_tx_xgwei(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
@@ -187,8 +187,8 @@ def test_sign_tx_xgwei(backend, scenario_navigator, firmware, navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_signature_validity(public_key, sig, transaction)
 
 # In this test a transaction is sent to the device to be signed and validated on screen.
 # The transaction is short and will be sent in one chunk.
@@ -233,8 +233,8 @@ def test_sign_tx_normal_tx(backend, scenario_navigator, firmware, navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_signature_validity(public_key, sig, transaction)
 
 # In this test a transaction is sent to the device to be signed and validated on screen.
 # The transaction is short and will be sent in one chunk.
@@ -284,8 +284,8 @@ def test_sign_tx_1559_tx(backend, scenario_navigator, firmware, navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_signature_validity(public_key, sig, transaction)
     
 # In this test a transaction is sent to the device to be signed and validated on screen.
 # The transaction is short and will be sent in one chunk
@@ -326,9 +326,9 @@ def test_sign_tx_short_tx_no_memo(backend, scenario_navigator, firmware):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
+    _, sig, _ = unpack_vrs_response(response)
     
-    assert check_signature_validity(public_key, der_sig, transaction)
+    assert check_rs_signature_validity(public_key, sig, transaction)
 
 
 # In this test a transaction is sent to the device to be signed and validated on screen.
@@ -376,8 +376,8 @@ def test_sign_tx_long_tx(backend, scenario_navigator, firmware, navigator):
         scenario_navigator.review_approve()
 
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_signature_validity(public_key, sig, transaction)
 
 
 # Transaction signature refused test
@@ -441,5 +441,5 @@ def test_personal_sign(backend, scenario_navigator, firmware, navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_vrs_response(response)
-    assert check_personal_signature_validity(public_key, der_sig, msg)
+    _, sig, _ = unpack_vrs_response(response)
+    assert check_rs_prefix_msg_signature_validity(public_key, sig, msg)
