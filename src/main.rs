@@ -95,8 +95,6 @@ pub enum AppSW {
     WrongResponseLength = 0xB000,
 }
 // To keep consistency with c version app-conflux
-// Cip37ConversionFail = 0xB008
-// DisplayBip32PathFail = 0xB001
 #[allow(dead_code)]
 const APP_SW_CIP37_CONVERSION_FAIL: u16 = 0xB008;
 #[allow(dead_code)]

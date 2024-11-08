@@ -65,9 +65,9 @@ Due to chip limitations, the Nano X does not currently support Rust development 
 
 You can purchase new hardware wallets like the Nano S Plus, Flex, or Stax. Import your recovery phrase and use the wallet after restoring it.
 
-### 3. I am a Conflux eSpace user, which app should I use?
+### 3. I am a Conflux ESpace user, which app should I use?
 
-Since the Conflux eSpace is fully compatible with the Ethereum, you can use the Ethereum app + MetaMask to interact with eSpace.
+Since the Conflux ESpace is fully compatible with the Ethereum, you can use the Ethereum app + MetaMask to interact with ESpace.
 
 ### 4. Does this app support the Conflux 1559 hardfork?
 
