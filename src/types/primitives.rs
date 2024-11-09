@@ -12,7 +12,7 @@ construct_uint! {
 }
 
 impl U256 {
-    pub fn to_cfx_str(&self) -> Option<String> {
+    pub fn cfx_str(&self) -> Option<String> {
         let wei_str = self.to_string();
         let wei = BigDecimal::from_str(&wei_str).ok()?;
         let eth_conversion = BigDecimal::from_i64(10_i64.pow(18))?;

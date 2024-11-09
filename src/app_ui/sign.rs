@@ -41,7 +41,7 @@ use alloc::format;
 ///
 /// * `tx` - Transaction to be displayed for validation
 pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
-    let value_str = tx.value.to_cfx_str().ok_or(AppSW::TxDisplayFail)?;
+    let value_str = tx.value.cfx_str().ok_or(AppSW::TxDisplayFail)?;
     let network = Network::from_network_id(tx.chain_id);
     let to_str = cfx_addr_encode(&*tx.to, network).map_err(|_e| AppSW::AddrDisplayFail)?;
     let data_str = format!("0x{}", hex::encode(tx.data.clone()).to_uppercase());
