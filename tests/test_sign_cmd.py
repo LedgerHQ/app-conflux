@@ -22,7 +22,7 @@ def test_sign_tx_short_tx(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -65,7 +65,7 @@ def test_sign_tx_1gwei(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -108,7 +108,7 @@ def test_sign_tx_very_big_value(backend, scenario_navigator, firmware, navigator
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -151,7 +151,7 @@ def test_sign_tx_xgwei(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -197,7 +197,7 @@ def test_sign_tx_normal_tx(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -243,7 +243,7 @@ def test_sign_tx_1559_tx(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -298,7 +298,7 @@ def test_sign_tx_short_tx_no_memo(backend, scenario_navigator, firmware):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
@@ -338,7 +338,7 @@ def test_sign_tx_short_tx_no_memo(backend, scenario_navigator, firmware):
 def test_sign_tx_long_tx(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     rapdu = client.get_public_key(path=path)
     _, public_key, _, _ = unpack_get_public_key_response(rapdu.data)
@@ -385,7 +385,7 @@ def test_sign_tx_long_tx(backend, scenario_navigator, firmware, navigator):
 def test_sign_tx_refused(backend, scenario_navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     rapdu = client.get_public_key(path=path)
     _, pub_key, _, _ = unpack_get_public_key_response(rapdu.data)
@@ -416,7 +416,7 @@ def test_personal_sign(backend, scenario_navigator, firmware, navigator):
     # Use the app interface instead of raw interface
     client = ConfluxCommandSender(backend)
     # The path used for this entire test
-    path: str = "m/503'/1'/0'/0/0"
+    path: str = "m/44'/503'/0'/0/0"
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
