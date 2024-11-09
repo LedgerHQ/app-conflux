@@ -15,7 +15,7 @@
  *  limitations under the License.
  *****************************************************************************/
 use crate::cfx_addr::{cfx_addr_encode, Network};
-use crate::types::{Transaction, U256};
+use crate::types::Transaction;
 use crate::AppSW;
 
 #[cfg(not(any(target_os = "stax", target_os = "flex")))]
@@ -41,7 +41,7 @@ use alloc::format;
 ///
 /// * `tx` - Transaction to be displayed for validation
 pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
-    let value_str = format!("{} {}", "CFX", drip_to_cfx(tx.value));
+    let value_str = tx.value.cfx_str().ok_or(AppSW::TxDisplayFail)?;
     let network = Network::from_network_id(tx.chain_id);
     let to_str = cfx_addr_encode(&*tx.to, network).map_err(|_e| AppSW::AddrDisplayFail)?;
     let data_str = format!("0x{}", hex::encode(tx.data.clone()).to_uppercase());
@@ -143,11 +143,4 @@ pub fn ui_display_msg(msg: &[u8]) -> Result<bool, AppSW> {
 
         Ok(review.show(&my_fields))
     }
-}
-
-// Converts Drip to CFX as a floating-point number (f64)
-fn drip_to_cfx(wei: U256) -> f64 {
-    let cfx_in_drip = U256::exp10(18); // 1 CFX = 10^18 Drip
-    let drip_as_f64 = wei.as_u128() as f64; // Small to medium-sized values only
-    drip_as_f64 / cfx_in_drip.as_u128() as f64
 }
