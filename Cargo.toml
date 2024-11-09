@@ -1,5 +1,5 @@
 [package]
-name = "app-conflux"
+name = "conflux"
 version = "0.1.0"
 authors = ["Pana"]
 edition = "2021"
