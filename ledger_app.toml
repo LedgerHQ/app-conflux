@@ -1,7 +1,7 @@
 [app]
 build_directory = "./"
 sdk = "Rust"
-devices = ["nanos+", "stax", "flex"]
+devices = ["nanox", "nanos+", "stax", "flex"]
 
 [tests]
 pytest_directory = "./tests/"

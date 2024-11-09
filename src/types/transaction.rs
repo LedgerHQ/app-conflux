@@ -1,13 +1,9 @@
+use super::{Address, H256, U256};
 use alloc::vec::Vec;
-use ethereum_types::{Address, H256, U256};
-use rlp::{Decodable, DecoderError, Encodable, Rlp, RlpDecodable, RlpEncodable, RlpStream};
+use rlp_decoder::{Decodable, DecoderError, Rlp};
 
 pub const TX_RLP_PREFIX_2930: [u8; 4] = [0x63, 0x66, 0x78, 0x01]; // "cfx" + 1
 pub const TX_RLP_PREFIX_1559: [u8; 4] = [0x63, 0x66, 0x78, 0x02]; // "cfx" + 2
-
-pub const TX_TYPE_LEGACY: u8 = 0;
-pub const TX_TYPE_EIP2930: u8 = 1;
-pub const TX_TYPE_EIP1559: u8 = 2;
 
 #[derive(Debug, Default, Clone)]
 pub struct Transaction {
@@ -25,26 +21,39 @@ pub struct Transaction {
     pub max_fee_per_gas: Option<U256>,
 }
 
-#[derive(Debug, Clone, Default, RlpEncodable, RlpDecodable, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct AccessListItem {
     pub address: Address,
     pub storage_keys: Vec<H256>,
 }
 
-pub type AccessList = Vec<AccessListItem>;
-
-impl Transaction {
-    pub fn tx_type(&self) -> u8 {
-        if self.max_fee_per_gas.is_some() && self.max_priority_fee_per_gas.is_some() {
-            TX_TYPE_EIP1559
-        } else if self.gas_price.is_some() && self.access_list.is_some() {
-            TX_TYPE_EIP2930
-        } else {
-            // gas_price is required
-            TX_TYPE_LEGACY
-        }
+impl Decodable for AccessListItem {
+    fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
+        Ok(Self {
+            address: rlp.val_at(0)?,
+            storage_keys: rlp.list_at(1)?,
+        })
     }
 }
+
+pub type AccessList = Vec<AccessListItem>;
+
+// pub const TX_TYPE_LEGACY: u8 = 0;
+// pub const TX_TYPE_EIP2930: u8 = 1;
+// pub const TX_TYPE_EIP1559: u8 = 2;
+
+// impl Transaction {
+//     pub fn tx_type(&self) -> u8 {
+//         if self.max_fee_per_gas.is_some() && self.max_priority_fee_per_gas.is_some() {
+//             TX_TYPE_EIP1559
+//         } else if self.gas_price.is_some() && self.access_list.is_some() {
+//             TX_TYPE_EIP2930
+//         } else {
+//             // gas_price is required
+//             TX_TYPE_LEGACY
+//         }
+//     }
+// }
 
 impl Decodable for Transaction {
     fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
@@ -123,182 +132,11 @@ impl Decodable for Transaction {
     }
 }
 
-impl Encodable for Transaction {
-    fn rlp_append(&self, stream: &mut RlpStream) {
-        match self.tx_type() {
-            TX_TYPE_LEGACY => {
-                stream.begin_list(9);
-                stream.append(&self.nonce);
-                stream.append(&self.gas_price.expect("gas_price is required"));
-                stream.append(&self.gas);
-                stream.append(&self.to);
-                stream.append(&self.value);
-                stream.append(&self.storage_limit);
-                stream.append(&self.epoch_height);
-                stream.append(&self.chain_id);
-                stream.append(&self.data);
-            }
-            TX_TYPE_EIP2930 => {
-                stream.append_raw(&TX_RLP_PREFIX_2930, 0);
-                stream.begin_list(10);
-                stream.append(&self.nonce);
-                stream.append(&self.gas_price.expect("gas_price is required"));
-                stream.append(&self.gas);
-                stream.append(&self.to);
-                stream.append(&self.value);
-                stream.append(&self.storage_limit);
-                stream.append(&self.epoch_height);
-                stream.append(&self.chain_id);
-                stream.append(&self.data);
-                stream.append_list(&self.access_list.as_ref().expect("access_list is required"));
-            }
-            TX_TYPE_EIP1559 => {
-                let empty_access_list: Vec<AccessListItem> = Vec::new();
-                stream.append_raw(&TX_RLP_PREFIX_1559, 0);
-                stream.begin_list(11);
-                stream.append(&self.nonce);
-                stream.append(
-                    &self
-                        .max_priority_fee_per_gas
-                        .expect("max_priority_fee_per_gas is required"),
-                );
-                stream.append(&self.max_fee_per_gas.expect("max_fee_per_gas is required"));
-                stream.append(&self.gas);
-                stream.append(&self.to);
-                stream.append(&self.value);
-                stream.append(&self.storage_limit);
-                stream.append(&self.epoch_height);
-                stream.append(&self.chain_id);
-                stream.append(&self.data);
-                stream.append_list(&self.access_list.as_ref().unwrap_or(&empty_access_list));
-            }
-            _ => {}
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use rlp::{decode, encode};
     use rustc_hex::{FromHex, ToHex};
-
-    #[test]
-    fn encode_basic() {
-        let to = Address::from_slice(
-            hex::decode("0123456789012345678901234567890123456789")
-                .unwrap()
-                .as_slice(),
-        );
-        let mut tx = Transaction {
-            to,
-            value: U256::from(1),
-            nonce: 1,
-            data: Bytes::from(""),
-            gas: 1,
-            gas_price: Some(U256::from(1)),
-            storage_limit: 1,
-            epoch_height: 1,
-            chain_id: 1,
-            access_list: None,
-            max_priority_fee_per_gas: None,
-            max_fee_per_gas: None,
-        };
-
-        let buf = encode(&tx);
-        assert_eq!(
-            buf.to_hex::<String>(),
-            "dd0101019401234567890123456789012345678901234567890101010180"
-        );
-
-        tx.data = Bytes::from("hello");
-        let buf2 = encode(&tx);
-        assert_eq!(
-            buf2.to_hex::<String>(),
-            "e2010101940123456789012345678901234567890123456789010101018568656c6c6f"
-        );
-    }
-
-    #[test]
-    fn encode_2930() {
-        let to = Address::from_slice(
-            hex::decode("0123456789012345678901234567890123456789")
-                .unwrap()
-                .as_slice(),
-        );
-        let mut tx = Transaction {
-            to,
-            value: U256::from(1),
-            nonce: 1,
-            data: Bytes::from("hello"),
-            gas: 1,
-            gas_price: Some(U256::from(1)),
-            storage_limit: 1,
-            epoch_height: 1,
-            chain_id: 1,
-            access_list: Some(vec![]),
-            max_priority_fee_per_gas: None,
-            max_fee_per_gas: None,
-        };
-
-        let buf = encode(&tx);
-        assert_eq!(
-            buf.to_hex::<String>(),
-            "63667801e3010101940123456789012345678901234567890123456789010101018568656c6c6fc0"
-        );
-
-        tx.access_list = Some(vec![AccessListItem {
-            address: to,
-            storage_keys: vec![H256::from_slice(
-                hex::decode("3d709d64e3b668ddc615a5b05d6f109275096d27571d99ba02d28e84feac6b00")
-                    .unwrap()
-                    .as_slice(),
-            )],
-        }]);
-
-        let buf2 = encode(&tx);
-        assert_eq!(buf2.to_hex::<String>(), "63667801f85c010101940123456789012345678901234567890123456789010101018568656c6c6ff838f7940123456789012345678901234567890123456789e1a03d709d64e3b668ddc615a5b05d6f109275096d27571d99ba02d28e84feac6b00");
-    }
-
-    #[test]
-    fn encode_1559() {
-        let to = Address::from_slice(
-            hex::decode("0123456789012345678901234567890123456789")
-                .unwrap()
-                .as_slice(),
-        );
-        let mut tx = Transaction {
-            to,
-            value: U256::from(1),
-            nonce: 1,
-            data: Bytes::from("hello"),
-            gas: 1,
-            gas_price: None,
-            storage_limit: 1,
-            epoch_height: 1,
-            chain_id: 1,
-            access_list: None,
-            max_priority_fee_per_gas: Some(U256::from(1)),
-            max_fee_per_gas: Some(U256::from(1)),
-        };
-
-        let buf = encode(&tx);
-        assert_eq!(
-            buf.to_hex::<String>(),
-            "63667802e401010101940123456789012345678901234567890123456789010101018568656c6c6fc0"
-        );
-
-        tx.access_list = Some(vec![AccessListItem {
-            address: to,
-            storage_keys: vec![H256::from_slice(
-                hex::decode("3d709d64e3b668ddc615a5b05d6f109275096d27571d99ba02d28e84feac6b00")
-                    .unwrap()
-                    .as_slice(),
-            )],
-        }]);
-        let buf2 = encode(&tx);
-        assert_eq!(buf2.to_hex::<String>(), "63667802f85d01010101940123456789012345678901234567890123456789010101018568656c6c6ff838f7940123456789012345678901234567890123456789e1a03d709d64e3b668ddc615a5b05d6f109275096d27571d99ba02d28e84feac6b00");
-    }
 
     #[test]
     fn decode_basic() {
