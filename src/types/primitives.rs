@@ -31,7 +31,7 @@ pub struct H256(pub [u8; HASH_LENGTH]);
 impl Decodable for H256 {
     fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
         rlp.decoder()
-            .decode_value(|bytes| match bytes.len().cmp(&(HASH_LENGTH as usize)) {
+            .decode_value(|bytes| match bytes.len().cmp(&(HASH_LENGTH)) {
                 Ordering::Less => Err(DecoderError::RlpIsTooShort),
                 Ordering::Greater => Err(DecoderError::RlpIsTooBig),
                 Ordering::Equal => {
@@ -49,7 +49,7 @@ pub struct Address(pub [u8; ADDRESS_LENGTH]);
 impl Decodable for Address {
     fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
         rlp.decoder()
-            .decode_value(|bytes| match bytes.len().cmp(&(ADDRESS_LENGTH as usize)) {
+            .decode_value(|bytes| match bytes.len().cmp(&(ADDRESS_LENGTH)) {
                 Ordering::Less => Err(DecoderError::RlpIsTooShort),
                 Ordering::Greater => Err(DecoderError::RlpIsTooBig),
                 Ordering::Equal => {

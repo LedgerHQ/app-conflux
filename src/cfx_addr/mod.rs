@@ -23,11 +23,11 @@ pub fn cfx_addr_encode(raw: &[u8], network: Network) -> Result<String, EncodingE
         48 => consts::SIZE_384,
         56 => consts::SIZE_448,
         64 => consts::SIZE_512,
-        _ => return Err(EncodingError::InvalidLength(length)),
+        _ => return Err(EncodingError::Length(length)),
     };
 
     // Get prefix
-    let prefix = network.to_prefix()?;
+    let prefix = network.prefix()?;
 
     // Convert payload to 5 bit array
     let mut payload = Vec::with_capacity(1 + raw.len());
@@ -39,7 +39,7 @@ pub fn cfx_addr_encode(raw: &[u8], network: Network) -> Result<String, EncodingE
     // Construct payload string using CHARSET
     let payload_str: String = payload_5_bits
         .iter()
-        .map(|b| CHARSET[*b as usize] as char)
+        .map(|b| CHARSET[*b as usize])
         .collect();
 
     // Create checksum

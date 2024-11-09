@@ -57,7 +57,7 @@ pub type AccessList = Vec<AccessListItem>;
 
 impl Decodable for Transaction {
     fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
-        if rlp.as_raw().len() == 0 {
+        if rlp.as_raw().is_empty() {
             return Err(DecoderError::RlpInvalidLength);
         };
         if rlp.is_list() {
@@ -124,9 +124,7 @@ impl Decodable for Transaction {
                         access_list: Some(rlp.list_at(10)?),
                     })
                 }
-                _ => {
-                    return Err(DecoderError::Custom("invalid raw transaction"));
-                }
+                _ => Err(DecoderError::Custom("invalid raw transaction")),
             }
         }
     }

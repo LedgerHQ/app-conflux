@@ -95,7 +95,7 @@ pub fn handler_sign_tx(
         } else {
             // Try to deserialize the transaction
             let tx: Transaction =
-                decode(&mut ctx.raw_tx.as_slice()).map_err(|_| AppSW::TxParsingFail)?;
+                decode(ctx.raw_tx.as_slice()).map_err(|_| AppSW::TxParsingFail)?;
             // Display transaction. If user approves
             // the transaction, sign it. Otherwise,
             // return a "deny" status word.
@@ -122,8 +122,8 @@ fn compute_signature_and_append(comm: &mut Comm, ctx: &mut TxContext) -> Result<
 
     let mut r: [u8; 32] = [0u8; 32];
     let mut s: [u8; 32] = [0u8; 32];
-    let _ =
-        decode_der_sig(&sig[..siglen as usize], &mut r, &mut s).map_err(|_| AppSW::TxSignFail)?;
+
+    decode_der_sig(&sig[..siglen as usize], &mut r, &mut s).map_err(|_| AppSW::TxSignFail)?;
 
     comm.append(&[parity as u8]);
     comm.append(&r);
