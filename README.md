@@ -1,6 +1,6 @@
 # App Conflux Rust
 
-This is the `Conflux Core Space` Ledger device app, which can work with the [`Conflux Fluent Wallet`](https://fluentwallet.com/) to send transactions to the Conflux Network (Core Space). This app adds support for the Conflux native token(CFX) to the Ledger Nano S+/Flex/Stax hardware wallet.
+This is the `Conflux Core Space` Ledger device app, which can work with the [`Conflux Fluent Wallet`](https://fluentwallet.com/) to send transactions to the Conflux Network (Core Space). This app adds support for the Conflux native token(CFX) to the Ledger Nano S+/Flex/Stax/X hardware wallet.
 
 Current Features:
 
@@ -55,19 +55,17 @@ cd app-conflux
 
 ## Faqs
 
-### 1. Why do not support the Ledger Nano S and Nano X?
+### 1. Why do not support the Ledger Nano S?
 
 The Nano S has not been sold since June 2022, and Ledger Live no longer supports new apps for the Nano S.
 
-Due to chip limitations, the Nano X does not currently support Rust development (does not support atomic swap). We will consider adding support for the Nano X in the future.
-
-### 2. If my device is a Nano S or Nano X, what should I do?
+### 2. If my device is a Nano S, what should I do?
 
 You can purchase new hardware wallets like the Nano S Plus, Flex, or Stax. Import your recovery phrase and use the wallet after restoring it.
 
-### 3. I am a Conflux ESpace user, which app should I use?
+### 3. I am a Conflux E Space user, which app should I use?
 
-Since the Conflux ESpace is fully compatible with the Ethereum, you can use the Ethereum app + MetaMask to interact with ESpace.
+Since the Conflux E Space is fully compatible with the Ethereum, you can use the Ethereum app + MetaMask to interact with E Space.
 
 ### 4. Does this app support the Conflux 1559 hardfork?
 

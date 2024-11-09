@@ -15,9 +15,8 @@
  *  limitations under the License.
  *****************************************************************************/
 use crate::cfx_addr::{cfx_addr_encode, Network};
-use crate::types::Transaction;
+use crate::types::{Transaction, U256};
 use crate::AppSW;
-use ethereum_types::U256;
 
 #[cfg(not(any(target_os = "stax", target_os = "flex")))]
 use ledger_device_sdk::ui::{
@@ -44,7 +43,7 @@ use alloc::format;
 pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
     let value_str = format!("{} {}", "CFX", drip_to_cfx(tx.value));
     let network = Network::from_network_id(tx.chain_id);
-    let to_str = cfx_addr_encode(tx.to.as_ref(), network).map_err(|_e| AppSW::AddrDisplayFail)?;
+    let to_str = cfx_addr_encode(&*tx.to, network).map_err(|_e| AppSW::AddrDisplayFail)?;
     let data_str = format!("0x{}", hex::encode(tx.data.clone()).to_uppercase());
 
     // Define transaction review fields
