@@ -1,11 +1,23 @@
+use alloc::string::{String, ToString};
+use bigdecimal::{BigDecimal, FromPrimitive};
 use core::cmp::Ordering;
 use core::ops::Deref;
+use core::str::FromStr;
 use rlp_decoder::{Decodable, DecoderError, Rlp};
 use uint::construct_uint;
 
 construct_uint! {
     /// 256-bit unsigned integer.
     pub struct U256(4);
+}
+
+impl U256 {
+    pub fn to_cfx_str(&self) -> Option<String> {
+        let wei_str = self.to_string();
+        let wei = BigDecimal::from_str(&wei_str).ok()?;
+        let eth_conversion = BigDecimal::from_i64(10_i64.pow(18))?;
+        Some((wei / eth_conversion).to_string())
+    }
 }
 
 impl Decodable for U256 {
