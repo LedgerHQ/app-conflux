@@ -33,7 +33,7 @@ cd app-conflux
 
 ### Build & Test
 
-![](./docs/ledger-device-app-build-shotcut.png)
+![build snapshot](./docs/ledger-device-app-build-shotcut.png)
 
 ## Resources
 
@@ -62,6 +62,8 @@ The Nano S has not been sold since June 2022, and Ledger Live no longer supports
 ### 2. If my device is a Nano S, what should I do?
 
 You can purchase new hardware wallets like the Nano S Plus, Flex, or Stax. Import your recovery phrase and use the wallet after restoring it.
+
+Or you can side load the app to your Nano S, check this [documentation](https://forum.conflux.fun/t/about-ledger-conflux-app-core-space/21188) for more details.
 
 ### 3. I am a Conflux E Space user, which app should I use?
 
