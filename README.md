@@ -35,6 +35,8 @@ cd app-conflux
 
 ![build snapshot](./docs/ledger-device-app-build-shotcut.png)
 
+Note: Nano X do not support side-load app, please use other device for physical test.
+
 ## Resources
 
 1. [Ledger Official Documentation](https://developers.ledger.com/docs/device-app/getting-started)
