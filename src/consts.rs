@@ -43,4 +43,4 @@ pub const APP_FLAG_BLIND_SIGNING_ENABLED: usize = 0x01;
 
 pub const APP_FLAG_DETAILED_DISPLAY_ENABLED: usize = 0x02;
 
-pub const PERSONAL_SIGN_PREFIX: &str = "\x19Conflux Signed Message:\n";
+// pub const PERSONAL_SIGN_PREFIX: &str = "\x19Conflux Signed Message:\n";

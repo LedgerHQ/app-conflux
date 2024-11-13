@@ -27,7 +27,6 @@ mod app_ui {
 mod handlers {
     pub mod get_public_key;
     pub mod get_version;
-    pub mod personal_sign;
     pub mod sign_tx;
 }
 mod cfx_addr;
@@ -41,7 +40,6 @@ use app_ui::menu::ui_menu_main;
 use handlers::{
     get_public_key::handler_get_public_key,
     get_version::handler_get_version,
-    personal_sign::handler_personal_sign,
     sign_tx::{handler_sign_tx, TxContext},
 };
 use ledger_device_sdk::io::{ApduHeader, Comm, Reply, StatusWords};
@@ -118,10 +116,6 @@ pub enum Instruction {
         chunk: u8,
         more: bool,
     },
-    PersonalSign {
-        chunk: u8,
-        more: bool,
-    },
 }
 
 impl TryFrom<ApduHeader> for Instruction {
@@ -148,13 +142,6 @@ impl TryFrom<ApduHeader> for Instruction {
             (3, P1_SIGN_TX_START, P2_SIGN_TX_MORE)
             | (3, 1..=P1_SIGN_TX_MAX, P2_SIGN_TX_LAST | P2_SIGN_TX_MORE) => {
                 Ok(Instruction::SignTx {
-                    chunk: value.p1,
-                    more: value.p2 == P2_SIGN_TX_MORE,
-                })
-            }
-            (4, P1_SIGN_TX_START, P2_SIGN_TX_MORE)
-            | (4, 1..=P1_SIGN_TX_MAX, P2_SIGN_TX_LAST | P2_SIGN_TX_MORE) => {
-                Ok(Instruction::PersonalSign {
                     chunk: value.p1,
                     more: value.p2 == P2_SIGN_TX_MORE,
                 })
@@ -253,8 +240,5 @@ fn handle_apdu(comm: &mut Comm, ins: &Instruction, ctx: &mut TxContext) -> Resul
             return_chain_code,
         } => handler_get_public_key(comm, *display, *return_chain_code),
         Instruction::SignTx { chunk, more } => handler_sign_tx(comm, *chunk, *more, ctx),
-        Instruction::PersonalSign { chunk, more } => {
-            handler_personal_sign(comm, *chunk, *more, ctx)
-        }
     }
 }
