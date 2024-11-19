@@ -1,4 +1,4 @@
-# App Conflux Rust
+# Ledger App Conflux Rust
 
 This is the `Conflux Core Space` Ledger device app, which can work with the [`Conflux Fluent Wallet`](https://fluentwallet.com/) to send transactions to the Conflux Network (Core Space). This app adds support for the Conflux native token(CFX) to the Ledger Nano S+/Flex/Stax/X hardware wallet.
 
@@ -9,7 +9,7 @@ Current Features:
 
 ## Command APDU
 
-[APDU specification](./docs/COMMANDS.md)
+[APDU specification](./docs/APDU.md)
 
 ## Building and installing
 
