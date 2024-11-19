@@ -17,7 +17,7 @@ pub const MAX_APPNAME_LEN: usize = 64;
 /**
  * Maximum transaction length (bytes).
  */
-pub const MAX_TRANSACTION_LEN: usize = 510;
+pub const MAX_TRANSACTION_LEN: usize = 765;
 
 /**
  * Maximum signature length (bytes).
