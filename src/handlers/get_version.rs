@@ -18,9 +18,25 @@ use crate::AppSW;
 use core::str::FromStr;
 use ledger_device_sdk::io;
 
+#[cfg(any(target_os = "stax", target_os = "flex"))]
+use crate::settings::Settings;
+
 pub fn handler_get_version(comm: &mut io::Comm) -> Result<(), AppSW> {
     if let Some((major, minor, patch)) = parse_version_string(env!("CARGO_PKG_VERSION")) {
-        let flags: u8 = 0b0000_0100; // TODO read from settings
+        #[cfg(not(any(target_os = "stax", target_os = "flex")))]
+        let flags: u8 = 0b0000_0100;
+
+        #[cfg(any(target_os = "stax", target_os = "flex"))]
+        let mut flags: u8 = 0b0000_0100;
+        #[cfg(any(target_os = "stax", target_os = "flex"))]
+        {
+            let settings: Settings = Default::default();
+            if settings.get_element(0) == 1 {
+                // If the first byte is 1, then the user has enabled the "Display data" setting
+                flags |= crate::consts::APP_FLAG_DETAILED_DISPLAY_ENABLED;
+            }
+        }
+
         comm.append(&[flags, major, minor, patch]);
         Ok(())
     } else {
