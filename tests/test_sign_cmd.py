@@ -399,7 +399,7 @@ def test_sign_tx_refused(backend, scenario_navigator):
         storageLimit=1,
         epochHeight=1,
         chainId=1029,
-        data="This transaction will be refused by the user".encode("utf-8")  # todo this should be a long string
+        data="This transaction will be refused by the user".encode("utf-8")
     ).serialize()
 
     with pytest.raises(ExceptionRAPDU) as e:
