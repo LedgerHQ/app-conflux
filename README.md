@@ -74,3 +74,7 @@ Since the Conflux E Space is fully compatible with the Ethereum, you can use the
 ### 4. Does this app support the Conflux 1559 hardfork?
 
 Yes
+
+### 5. Which version of Fluent Wallet should I use?
+
+This Ledger Conflux app needs to be used with Fluent Wallet version ***above 2.8.0***. Supported browsers include Chrome and Edge.
