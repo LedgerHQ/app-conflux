@@ -14,8 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *****************************************************************************/
-#![allow(unused_assignments)]
-
 use include_gif::include_gif;
 use ledger_device_sdk::io::Comm;
 
@@ -59,12 +57,11 @@ fn ui_setting_menu(comm: &mut Comm) -> Event<Instruction> {
     let mut bs_enabled: bool = settings.get_element(blind_signing_index) != 0;
     let mut bs_status = if bs_enabled { "Enabled" } else { "Disabled" };
 
-    let pages = [
-        &Page::from((["Blind Signing", bs_status], true)),
-        &Page::from(("Back", &BACK)),
-    ];
-
     loop {
+        let pages = [
+            &Page::from((["Blind Signing", bs_status], true)),
+            &Page::from(("Back", &BACK)),
+        ];
         match MultiPageMenu::new(comm, &pages).show() {
             EventOrPageIndex::Event(e) => return e,
             EventOrPageIndex::Index(0) => {
