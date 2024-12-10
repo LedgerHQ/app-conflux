@@ -38,22 +38,9 @@ impl Decodable for AccessListItem {
 
 pub type AccessList = Vec<AccessListItem>;
 
-// pub const TX_TYPE_LEGACY: u8 = 0;
-// pub const TX_TYPE_EIP2930: u8 = 1;
-// pub const TX_TYPE_EIP1559: u8 = 2;
-
-// impl Transaction {
-//     pub fn tx_type(&self) -> u8 {
-//         if self.max_fee_per_gas.is_some() && self.max_priority_fee_per_gas.is_some() {
-//             TX_TYPE_EIP1559
-//         } else if self.gas_price.is_some() && self.access_list.is_some() {
-//             TX_TYPE_EIP2930
-//         } else {
-//             // gas_price is required
-//             TX_TYPE_LEGACY
-//         }
-//     }
-// }
+pub const TX_LEGACY_RLP_LEN: usize = 9;
+pub const TX_EIP2930_RLP_LEN: usize = 10;
+pub const TX_EIP1559_RLP_LEN: usize = 11;
 
 impl Decodable for Transaction {
     fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
@@ -61,7 +48,7 @@ impl Decodable for Transaction {
             return Err(DecoderError::RlpInvalidLength);
         };
         if rlp.is_list() {
-            if rlp.item_count()? != 9 {
+            if rlp.item_count()? != TX_LEGACY_RLP_LEN {
                 return Err(DecoderError::RlpInvalidLength);
             }
             Ok(Transaction {
@@ -87,7 +74,7 @@ impl Decodable for Transaction {
             let rlp = Rlp::new(&data[4..]);
             match first4_bytes {
                 TX_RLP_PREFIX_2930 => {
-                    if rlp.item_count()? != 10 {
+                    if rlp.item_count()? != TX_EIP2930_RLP_LEN {
                         return Err(DecoderError::RlpInvalidLength);
                     }
                     Ok(Transaction {
@@ -106,7 +93,7 @@ impl Decodable for Transaction {
                     })
                 }
                 TX_RLP_PREFIX_1559 => {
-                    if rlp.item_count()? != 11 {
+                    if rlp.item_count()? != TX_EIP1559_RLP_LEN {
                         return Err(DecoderError::RlpInvalidLength);
                     }
                     Ok(Transaction {

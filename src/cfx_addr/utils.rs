@@ -69,7 +69,6 @@ pub fn convert_bits(
             ret.push((acc << (outbits - num)) as u8);
         }
     } else {
-        // FIXME: add unit tests for it.
         // If there's some bits left, figure out if we need to remove padding
         // and add it
         let padding = ((data.len() * inbits as usize) % outbits as usize) as u8;

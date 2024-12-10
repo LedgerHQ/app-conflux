@@ -1,3 +1,4 @@
+use crate::AppSW;
 use ledger_device_sdk::nvm::*;
 use ledger_device_sdk::NVMData;
 
@@ -30,20 +31,27 @@ impl Settings {
     }
 
     #[allow(unused)]
-    pub fn get_element(&self, index: usize) -> u8 {
+    pub fn get_element(&self, index: usize) -> Result<u8, AppSW> {
+        if index >= SETTINGS_SIZE {
+            return Err(AppSW::InternalError);
+        }
         let storage = unsafe { DATA.get_ref() };
         let settings = storage.get_ref();
-        settings[index]
+        Ok(settings[index])
     }
 
     #[allow(unused)]
     // can be used to set a value in the settings
-    pub fn set_element(&self, index: usize, value: u8) {
+    pub fn set_element(&self, index: usize, value: u8) -> Result<(), AppSW> {
+        if index >= SETTINGS_SIZE {
+            return Err(AppSW::InternalError);
+        }
         let storage = unsafe { DATA.get_mut() };
         let mut updated_data = *storage.get_ref();
         updated_data[index] = value;
         unsafe {
             storage.update(&updated_data);
         }
+        Ok(())
     }
 }

@@ -46,5 +46,8 @@ pub const ADDRESS_TYPE_NULL: &str = "null";
 pub const ADDRESS_TYPE_UNKNOWN: &str = "unknown";
 pub const ADDRESS_TYPE_USER: &str = "user";
 
+pub const MAIN_NET_ID: u64 = 1029;
+pub const TEST_NET_ID: u64 = 1;
+
 // These two network_ids are reserved.
-pub const RESERVED_NETWORK_IDS: [u64; 2] = [1, 1029];
+pub const RESERVED_NETWORK_IDS: [u64; 2] = [TEST_NET_ID, MAIN_NET_ID];

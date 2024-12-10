@@ -32,8 +32,6 @@ use crate::Instruction;
 #[cfg(not(any(target_os = "stax", target_os = "flex")))]
 use ledger_device_sdk::io::Event;
 
-// use ledger_device_sdk::nvm::*;
-
 #[cfg(not(any(target_os = "stax", target_os = "flex")))]
 fn ui_about_menu(comm: &mut Comm) -> Event<Instruction> {
     let pages = [
@@ -54,7 +52,7 @@ fn ui_setting_menu(comm: &mut Comm) -> Event<Instruction> {
     let blind_signing_index = 0;
 
     let settings: Settings = Default::default();
-    let mut bs_enabled: bool = settings.get_element(blind_signing_index) != 0;
+    let mut bs_enabled: bool = settings.get_element(blind_signing_index).unwrap() != 0;
     let mut bs_status = if bs_enabled { "Enabled" } else { "Disabled" };
 
     loop {
@@ -68,11 +66,15 @@ fn ui_setting_menu(comm: &mut Comm) -> Event<Instruction> {
                 bs_enabled = !bs_enabled;
                 match bs_enabled {
                     true => {
-                        settings.set_element(blind_signing_index, 1);
+                        settings
+                            .set_element(blind_signing_index, 1)
+                            .expect("should success");
                         bs_status = "Enabled";
                     }
                     false => {
-                        settings.set_element(blind_signing_index, 0);
+                        settings
+                            .set_element(blind_signing_index, 0)
+                            .expect("should success");
                         bs_status = "Disabled";
                     }
                 }

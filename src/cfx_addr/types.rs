@@ -1,4 +1,6 @@
-use super::consts::{MAINNET_PREFIX, RESERVED_NETWORK_IDS, TESTNET_PREFIX};
+use super::consts::{
+    MAINNET_PREFIX, MAIN_NET_ID, RESERVED_NETWORK_IDS, TESTNET_PREFIX, TEST_NET_ID,
+};
 use alloc::{format, string::String};
 use core::fmt;
 
@@ -29,8 +31,8 @@ impl Network {
 
     pub fn from_network_id(network_id: u64) -> Self {
         match network_id {
-            1029 => Self::Main,
-            1 => Self::Test,
+            MAIN_NET_ID => Self::Main,
+            TEST_NET_ID => Self::Test,
             _ => Self::Id(network_id),
         }
     }

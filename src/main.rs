@@ -69,7 +69,7 @@ const P1_SIGN_TX_MAX: u8 = 0x03;
 
 // Application status words.
 #[repr(u16)]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum AppSW {
     Deny = 0x6985,
     WrongP1P2 = 0x6A86,
@@ -91,6 +91,7 @@ pub enum AppSW {
     InvalidData = 0x6A80,
     WrongDataLength = 0x6A87,
     WrongResponseLength = 0xB000,
+    InternalError = 0x6F01,
 }
 // To keep consistency with c version app-conflux
 #[allow(dead_code)]

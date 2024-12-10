@@ -24,11 +24,11 @@ pub fn handler_get_version(comm: &mut io::Comm) -> Result<(), AppSW> {
     if let Some((major, minor, patch)) = parse_version_string(env!("CARGO_PKG_VERSION")) {
         let mut flags: u8 = 0b0000_0100;
         let settings: Settings = Default::default();
-        if settings.get_element(0) == 1 {
+        if settings.get_element(0)? == 1 {
             // If the first byte is 1, then the user has enabled the "Blind signing" setting
             flags |= crate::consts::APP_FLAG_BLIND_SIGNING_ENABLED;
         }
-        if settings.get_element(1) == 1 {
+        if settings.get_element(1)? == 1 {
             // If the first byte is 1, then the user has enabled the "Display data" setting
             flags |= crate::consts::APP_FLAG_DETAILED_DISPLAY_ENABLED;
         }
