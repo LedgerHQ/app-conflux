@@ -1,4 +1,3 @@
-#![allow(unused)]
 mod consts;
 mod types;
 mod utils;

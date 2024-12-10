@@ -71,7 +71,7 @@ pub fn convert_bits(
     } else {
         // If there's some bits left, figure out if we need to remove padding
         // and add it
-        let padding = ((data.len() * inbits as usize) % outbits as usize) as u8;
+        let _padding = ((data.len() * inbits as usize) % outbits as usize) as u8;
         if num >= inbits || acc != 0 {
             return Err("InvalidPadding");
         }

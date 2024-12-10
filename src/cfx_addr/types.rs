@@ -41,7 +41,6 @@ impl Network {
 /// Error concerning encoding of cfx_base32_addr.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum EncodingError {
-    AddressType(u8),
     Length(usize),
     NetworkId(u64),
 }
@@ -49,9 +48,6 @@ pub enum EncodingError {
 impl fmt::Display for EncodingError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::AddressType(type_byte) => {
-                write!(f, "unrecognized type bits 0x{:02x}", type_byte)
-            }
             Self::Length(length) => {
                 write!(f, "invalid length ({})", length)
             }
@@ -60,10 +56,4 @@ impl fmt::Display for EncodingError {
             }
         }
     }
-}
-
-#[derive(Copy, Clone)]
-pub enum EncodingOptions {
-    Simple,
-    QrCode,
 }

@@ -30,7 +30,6 @@ impl Settings {
         return unsafe { DATA.get_ref() };
     }
 
-    #[allow(unused)]
     pub fn get_element(&self, index: usize) -> Result<u8, AppSW> {
         if index >= SETTINGS_SIZE {
             return Err(AppSW::InternalError);
@@ -40,7 +39,6 @@ impl Settings {
         Ok(settings[index])
     }
 
-    #[allow(unused)]
     // can be used to set a value in the settings
     pub fn set_element(&self, index: usize, value: u8) -> Result<(), AppSW> {
         if index >= SETTINGS_SIZE {
@@ -49,9 +47,7 @@ impl Settings {
         let storage = unsafe { DATA.get_mut() };
         let mut updated_data = *storage.get_ref();
         updated_data[index] = value;
-        unsafe {
-            storage.update(&updated_data);
-        }
+        storage.update(&updated_data);
         Ok(())
     }
 }
