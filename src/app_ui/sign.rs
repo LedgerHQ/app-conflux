@@ -95,7 +95,7 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
 
         // If first setting switch is disabled do not display the transaction data
         let settings: Settings = Default::default();
-        if settings.get_element(1) == 0 {
+        if settings.get_element(1)? == 0 {
             Ok(review.show(&my_fields[0..2]))
         } else {
             Ok(review.show(&my_fields))

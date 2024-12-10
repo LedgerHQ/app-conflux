@@ -41,6 +41,7 @@ pub fn handler_get_public_key(
 
     let (k, cc) = Secp256k1::derive_from(path.as_ref());
     let pk = k.public_key().map_err(|_| AppSW::KeyDeriveFail)?;
+    drop(k);
 
     // Display address on device if requested
     if display {

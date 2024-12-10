@@ -1,4 +1,6 @@
-use super::consts::{MAINNET_PREFIX, RESERVED_NETWORK_IDS, TESTNET_PREFIX};
+use super::consts::{
+    MAINNET_PREFIX, MAIN_NET_ID, RESERVED_NETWORK_IDS, TESTNET_PREFIX, TEST_NET_ID,
+};
 use alloc::{format, string::String};
 use core::fmt;
 
@@ -29,8 +31,8 @@ impl Network {
 
     pub fn from_network_id(network_id: u64) -> Self {
         match network_id {
-            1029 => Self::Main,
-            1 => Self::Test,
+            MAIN_NET_ID => Self::Main,
+            TEST_NET_ID => Self::Test,
             _ => Self::Id(network_id),
         }
     }
@@ -39,7 +41,6 @@ impl Network {
 /// Error concerning encoding of cfx_base32_addr.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum EncodingError {
-    AddressType(u8),
     Length(usize),
     NetworkId(u64),
 }
@@ -47,9 +48,6 @@ pub enum EncodingError {
 impl fmt::Display for EncodingError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::AddressType(type_byte) => {
-                write!(f, "unrecognized type bits 0x{:02x}", type_byte)
-            }
             Self::Length(length) => {
                 write!(f, "invalid length ({})", length)
             }
@@ -58,10 +56,4 @@ impl fmt::Display for EncodingError {
             }
         }
     }
-}
-
-#[derive(Copy, Clone)]
-pub enum EncodingOptions {
-    Simple,
-    QrCode,
 }
