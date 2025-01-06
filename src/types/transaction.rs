@@ -7,6 +7,7 @@ pub const TX_RLP_PREFIX_2930: [u8; 4] = [0x63, 0x66, 0x78, 0x01]; // "cfx" + 1
 pub const TX_RLP_PREFIX_1559: [u8; 4] = [0x63, 0x66, 0x78, 0x02]; // "cfx" + 2
 pub const ONE_CFX_IN_DRIP: u64 = 1_000_000_000_000_000_000;
 
+#[allow(dead_code)]
 #[derive(Debug, Default, Clone)]
 pub struct Transaction {
     pub to: Address,
@@ -41,7 +42,7 @@ impl Transaction {
     // when the tx is to a contract address, the data field is not empty
     // we call it not fully decoded
     pub fn fully_decoded(&self) -> bool {
-        self.data.len() == 0 || self.to.is_user_address()
+        self.data.is_empty() || self.to.is_user_address()
     }
 }
 
