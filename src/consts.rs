@@ -18,3 +18,8 @@ pub const EXPONENT_SMALLEST_UNIT: usize = 18;
 pub const APP_FLAG_BLIND_SIGNING_ENABLED: u8 = 0x01;
 
 pub const APP_FLAG_DETAILED_DISPLAY_ENABLED: u8 = 0x02;
+
+/**
+ * One CFX that can be paid for storage.
+ */
+pub const STORAGE_OF_ONE_CFX: u64 = 1024;

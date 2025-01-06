@@ -1,9 +1,11 @@
 use super::{Address, H256, U256};
+use crate::consts::STORAGE_OF_ONE_CFX;
 use alloc::vec::Vec;
 use rlp_decoder::{Decodable, DecoderError, Rlp};
 
 pub const TX_RLP_PREFIX_2930: [u8; 4] = [0x63, 0x66, 0x78, 0x01]; // "cfx" + 1
 pub const TX_RLP_PREFIX_1559: [u8; 4] = [0x63, 0x66, 0x78, 0x02]; // "cfx" + 2
+pub const ONE_CFX_IN_DRIP: u64 = 1_000_000_000_000_000_000;
 
 #[derive(Debug, Default, Clone)]
 pub struct Transaction {
@@ -19,6 +21,28 @@ pub struct Transaction {
     pub access_list: Option<AccessList>,
     pub max_priority_fee_per_gas: Option<U256>,
     pub max_fee_per_gas: Option<U256>,
+}
+
+impl Transaction {
+    pub fn max_gas_fee(&self) -> U256 {
+        if self.gas_price.is_some() {
+            self.gas_price.unwrap() * U256::from(self.gas)
+        } else {
+            self.max_fee_per_gas.unwrap() * U256::from(self.gas)
+        }
+    }
+
+    pub fn max_storage_fee(&self) -> U256 {
+        U256::from(self.storage_limit) * U256::from(ONE_CFX_IN_DRIP)
+            / U256::from(STORAGE_OF_ONE_CFX)
+    }
+
+    // whether the tx is fully decoded
+    // when the tx is to a contract address, the data field is not empty
+    // we call it not fully decoded
+    pub fn fully_decoded(&self) -> bool {
+        self.data.len() == 0 || self.to.is_user_address()
+    }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
