@@ -21,7 +21,8 @@ A Ledger Device is a hardware wallet that is considered one of the most secure w
 2. The latest firmware is installed (Ledger Nano S Plus).
 3. Ledger Live is ready to use.
 4. Install the latest version of [Conflux Fluent Wallet](https://fluentwallet.com/) (above 2.8.0)
-    ![](./imgs/fluent-home.jpg)
+
+![](./imgs/fluent-home.jpg)
 
 ## Video Guide
 
@@ -48,16 +49,25 @@ https://youtu.be/QaDE8k57dGQ
     ![](./imgs/ledger-conflux-ready.jpg)
 3. Open the Conflux Fluent Wallet Application.
 4. Open settings(top right) and choose the "Account Management" option.
-   ![](./imgs/account-management.jpg)
+
+![](./imgs/account-management.jpg)
+
 5. Click the "Add Account" button.
-    ![](./imgs/account-add.jpg)
+
+![](./imgs/account-add.jpg)
+
 6. Choose hardware wallet and make your hardware wallet ready.
-    ![](./imgs/account-add-choose-hardware.jpg)
-    ![](./imgs/account-add-ledger-guide.jpg)
+
+![](./imgs/account-add-choose-hardware.jpg)
+![](./imgs/account-add-ledger-guide.jpg)
+
 7. Choose address and Click Import button
-    ![](./imgs/fluent-import-choose-address.jpg)
+
+![](./imgs/fluent-import-choose-address.jpg)
+
 8. Success
-    ![](./imgs/account-add-success.jpg)
+
+![](./imgs/account-add-success.jpg)
 
 ## View Account Balance
 
@@ -75,7 +85,9 @@ The copy icon and QR code icon are located on the right side of the address.
 
 1. Click the `Send` button on the Fluent Wallet.
 2. Fill in the recipient address, choose token to send and fill in amount to send.
-    ![](./imgs/fluent-send-tx.jpg)
+
+![](./imgs/fluent-send-tx.jpg)
+
 3. Click the `Next` button. And confirm the transaction on your Ledger Device.
     ![](./imgs/ledger-review-tx1.jpg)
     ![](./imgs/ledger-review-tx-amount.jpg)
@@ -86,14 +98,16 @@ The copy icon and QR code icon are located on the right side of the address.
     ![](./imgs/ledger-review-tx-reject.jpg)
 4. If everything is correct, in the `Approve` page, click both left and right buttons on your Ledger Device to confirm the transaction.
 5. The transaction is now sent and you can view it in the transaction history.
-   ![](./imgs/tx-history-entry.jpg)
-   ![](./imgs/tx-history.jpg)
+
+![](./imgs/tx-history-entry.jpg)
+![](./imgs/tx-history.jpg)
+
 6. If you are sending tokens, you need to enable the "Blind Signing" in the Ledger Device.
-   ![](./imgs/ledger-setting-2.jpg)
-    Click both left and right buttons on your Ledger Device to enable the "Blind Signing".
-   ![](./imgs/ledger-setting-1.jpg)
+![](./imgs/ledger-setting-2.jpg)
+Click both left and right buttons on your Ledger Device to enable the "Blind Signing".
+![](./imgs/ledger-setting-1.jpg)
 7. A blind signing warning will appear when you send tokens.
-   ![](./imgs/ledger-review-tx-blind-sign.jpg)
+![](./imgs/ledger-review-tx-blind-sign.jpg)
 
 ## FAQs
 

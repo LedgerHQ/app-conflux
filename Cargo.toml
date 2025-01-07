@@ -21,9 +21,6 @@ rustc-hex = { version = "2.1.0", default-features = false }
 opt-level = 'z'
 lto = true
 
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
-
 [features]
 default = ["pending_review_screen"]
 pending_review_screen = []
@@ -45,3 +42,6 @@ icon = "icons/cfx_32.gif"
 
 [package.metadata.ledger.flex]
 icon = "icons/cfx_40.gif"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("stax", "flex", "nanos", "nanox", "nanosplus"))'] }

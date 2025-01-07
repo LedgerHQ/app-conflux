@@ -15,6 +15,7 @@
  *  limitations under the License.
  *****************************************************************************/
 use crate::cfx_addr::{cfx_addr_encode, Network};
+use crate::handlers::sign_tx::TxContext;
 use crate::settings::Settings;
 use crate::types::{Transaction, U256};
 use crate::AppSW;
@@ -28,7 +29,7 @@ use ledger_device_sdk::ui::{
 #[cfg(any(target_os = "stax", target_os = "flex"))]
 use include_gif::include_gif;
 #[cfg(any(target_os = "stax", target_os = "flex"))]
-use ledger_device_sdk::nbgl::{Field, NbglChoice, NbglGlyph, NbglReview};
+use ledger_device_sdk::nbgl::{Field, NbglChoice, NbglGlyph, NbglReview, PageIndex};
 
 use alloc::{format, vec};
 
@@ -39,7 +40,8 @@ use alloc::{format, vec};
 /// # Arguments
 ///
 /// * `tx` - Transaction to be displayed for validation
-pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
+#[allow(unused_variables)]
+pub fn ui_display_tx(tx: &Transaction, ctx: &mut TxContext) -> Result<bool, AppSW> {
     let fully_decoded = tx.fully_decoded();
 
     let value_str = tx.value.cfx_str().ok_or(AppSW::TxDisplayFail)?;
@@ -122,13 +124,20 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
     #[cfg(any(target_os = "stax", target_os = "flex"))]
     {
         if !fully_decoded && settings.get_element(0)? == 0 {
-            let _confirmed = NbglChoice::new().show(
+            let confirmed = NbglChoice::new().show(
                 "This transaction cannot be clear-signed",
                 "Enable blind signing in the settings to sign this transaction.",
                 "Go to settings",
                 "Reject transaction",
             );
+
+            if confirmed {
+                ctx.home.set_start_page(PageIndex::Settings(0));
+            }
+
             return Ok(false);
+        } else {
+            ctx.home.set_start_page(PageIndex::Home);
         }
         // Load glyph from 64x64 4bpp gif file with include_gif macro. Creates an NBGL compatible glyph.
         const CFX: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
