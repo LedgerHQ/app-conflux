@@ -21,13 +21,13 @@ impl Settings {
     #[inline(never)]
     #[allow(unused)]
     pub fn get_mut(&mut self) -> &mut AtomicStorage<[u8; SETTINGS_SIZE]> {
-        return unsafe { DATA.get_mut() };
+        unsafe { DATA.get_mut() }
     }
 
     #[inline(never)]
     #[allow(unused)]
     pub fn get_ref(&mut self) -> &AtomicStorage<[u8; SETTINGS_SIZE]> {
-        return unsafe { DATA.get_ref() };
+        unsafe { DATA.get_ref() }
     }
 
     #[allow(unused)]

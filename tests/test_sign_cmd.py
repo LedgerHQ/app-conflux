@@ -13,6 +13,14 @@ from cfx_address import Base32Address
 # cfxtest:aajwgvnhveawgvnhveawgvnhveawgvnhveyknat519
 TARGET_ADDRESS = "0x1123456789012345678901234567890123456789"
 
+TARGET_CONTRACT_ADDRESS = "0x8123456789012345678901234567890123456789"
+
+MAIN_NET_ID = 1029
+
+# stax, flex setting option location
+# first setting option (200, 113)
+# second setting option (200, 293)
+
 # In these tests we check the behavior of the device when asked to sign a transaction
 
 # In this test a transaction is sent to the device to be signed and validated on screen.
@@ -30,21 +38,21 @@ def test_sign_tx_short_tx(backend, scenario_navigator, firmware, navigator):
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=Web3.to_wei(1, 'ether'),
         nonce=1,
         gas=1,
         gasPrice=1,
         storageLimit=1,
         epochHeight=1,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="hello cfx".encode("utf-8")
     ).serialize()
 
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
-                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavIns(NavInsID.TOUCH, (200, 293)),
                             NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
                             screen_change_before_first_instruction=False,
                             screen_change_after_last_instruction=False)
@@ -73,21 +81,21 @@ def test_sign_tx_1gwei(backend, scenario_navigator, firmware, navigator):
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=Web3.to_wei(1, 'gwei'),
         nonce=1,
         gas=1,
         gasPrice=1,
         storageLimit=1,
         epochHeight=1,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="hello cfx".encode("utf-8")
     ).serialize()
 
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
-                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavIns(NavInsID.TOUCH, (200, 293)),
                             NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
                             screen_change_before_first_instruction=False,
                             screen_change_after_last_instruction=False)
@@ -116,21 +124,21 @@ def test_sign_tx_very_big_value(backend, scenario_navigator, firmware, navigator
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=Web3.to_wei(123456789000.12345, 'ether'),
         nonce=1,
         gas=1,
         gasPrice=1,
         storageLimit=1,
         epochHeight=1,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="hello cfx".encode("utf-8")
     ).serialize()
 
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
-                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavIns(NavInsID.TOUCH, (200, 293)),
                             NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
                             screen_change_before_first_instruction=False,
                             screen_change_after_last_instruction=False)
@@ -159,21 +167,21 @@ def test_sign_tx_xgwei(backend, scenario_navigator, firmware, navigator):
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=Web3.to_wei(123456.789, 'gwei'),
         nonce=1,
         gas=1,
         gasPrice=1,
         storageLimit=1,
         epochHeight=1,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="hello cfx".encode("utf-8")
     ).serialize()
 
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
-                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavIns(NavInsID.TOUCH, (200, 293)),
                             NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
                             screen_change_before_first_instruction=False,
                             screen_change_after_last_instruction=False)
@@ -205,21 +213,21 @@ def test_sign_tx_normal_tx(backend, scenario_navigator, firmware, navigator):
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=Web3.to_wei(12345.6789, 'ether'),
         nonce=1,
         gas=31000,
         gasPrice=Web3.to_wei(10, 'gwei'),
         storageLimit=1000,
         epochHeight=108829345,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="hello cfx".encode("utf-8")
     ).serialize()
 
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
-                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavIns(NavInsID.TOUCH, (200, 293)),
                             NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
                             screen_change_before_first_instruction=False,
                             screen_change_after_last_instruction=False)
@@ -251,7 +259,7 @@ def test_sign_tx_1559_tx(backend, scenario_navigator, firmware, navigator):
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=Web3.to_wei(12345.6789, 'ether'),
         nonce=1,
         gas=31000,
@@ -259,10 +267,10 @@ def test_sign_tx_1559_tx(backend, scenario_navigator, firmware, navigator):
         maxFeePerGas=Web3.to_wei(20, 'gwei'),
         storageLimit=1000,
         epochHeight=108829345,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="hello cfx".encode("utf-8"),
         accessList=[{
-            "address": Base32Address(TARGET_ADDRESS, network_id=1029),
+            "address": Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
             "storageKeys": ["0x3d709d64e3b668ddc615a5b05d6f109275096d27571d99ba02d28e84feac6b00"]
         }],
     ).serialize()
@@ -270,7 +278,7 @@ def test_sign_tx_1559_tx(backend, scenario_navigator, firmware, navigator):
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
-                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavIns(NavInsID.TOUCH, (200, 293)),
                             NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
                             screen_change_before_first_instruction=False,
                             screen_change_after_last_instruction=False)
@@ -306,14 +314,14 @@ def test_sign_tx_short_tx_no_memo(backend, scenario_navigator, firmware):
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=1,
         nonce=1,
         gas=1,
         gasPrice=1,
         storageLimit=1,
         epochHeight=1,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="".encode("utf-8")
     ).serialize()
 
@@ -349,21 +357,21 @@ def test_sign_tx_long_tx(backend, scenario_navigator, firmware, navigator):
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.")
 
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=1,
         nonce=1,
         gas=1,
         gasPrice=1,
         storageLimit=1,
         epochHeight=1,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data=data_str.encode("utf-8")
     ).serialize()
     
     # Enable display of transaction data (NBGL devices only)
     if not firmware.device.startswith("nano"):
         navigator.navigate([NavInsID.USE_CASE_HOME_SETTINGS,
-                            NavIns(NavInsID.TOUCH, (200, 113)),
+                            NavIns(NavInsID.TOUCH, (200, 293)),
                             NavInsID.USE_CASE_SUB_SETTINGS_EXIT],
                             screen_change_before_first_instruction=False,
                             screen_change_after_last_instruction=False)
@@ -391,14 +399,14 @@ def test_sign_tx_refused(backend, scenario_navigator):
     _, pub_key, _, _ = unpack_get_public_key_response(rapdu.data)
 
     transaction = Transaction(
-        to=Base32Address(TARGET_ADDRESS, network_id=1029),
+        to=Base32Address(TARGET_ADDRESS, network_id=MAIN_NET_ID),
         value=1,
         nonce=1,
         gas=1,
         gasPrice=1,
         storageLimit=1,
         epochHeight=1,
-        chainId=1029,
+        chainId=MAIN_NET_ID,
         data="This transaction will be refused by the user".encode("utf-8")
     ).serialize()
 

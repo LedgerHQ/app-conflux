@@ -56,6 +56,26 @@ impl Decodable for H256 {
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Address(pub [u8; ADDRRESS_BYTES_LEN]);
 
+impl Address {
+    pub fn address_type(&self) -> u8 {
+        self.0[0] & 0xf0
+    }
+
+    pub fn is_user_address(&self) -> bool {
+        self.address_type() == 0x10
+    }
+
+    #[allow(unused)]
+    pub fn is_contract_address(&self) -> bool {
+        self.address_type() == 0x80
+    }
+
+    #[allow(unused)]
+    pub fn is_builtin_address(&self) -> bool {
+        self.address_type() == 0x00
+    }
+}
+
 impl Decodable for Address {
     fn decode(rlp: &Rlp) -> Result<Self, DecoderError> {
         rlp.decoder()

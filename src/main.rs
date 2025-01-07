@@ -17,6 +17,8 @@
 
 #![no_std]
 #![no_main]
+#![allow(static_mut_refs)]
+#![allow(unexpected_cfgs)]
 
 mod utils;
 mod app_ui {
