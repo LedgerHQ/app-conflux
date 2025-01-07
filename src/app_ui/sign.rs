@@ -15,16 +15,16 @@
  *  limitations under the License.
  *****************************************************************************/
 use crate::cfx_addr::{cfx_addr_encode, Network};
+use crate::settings::Settings;
 use crate::types::{Transaction, U256};
 use crate::AppSW;
 
 #[cfg(not(any(target_os = "stax", target_os = "flex")))]
 use ledger_device_sdk::ui::{
-    bitmaps::{CROSSMARK, EYE, VALIDATE_14},
+    bitmaps::{CROSSMARK, EYE, VALIDATE_14, WARNING},
     gadgets::{clear_screen, Field, MultiFieldReview, Page},
 };
 
-use crate::settings::Settings;
 #[cfg(any(target_os = "stax", target_os = "flex"))]
 use include_gif::include_gif;
 #[cfg(any(target_os = "stax", target_os = "flex"))]
@@ -67,6 +67,7 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
         },
     ];
 
+    // If max storage fee is not zero, add it to the review fields
     let storage_fee_str = tx.max_storage_fee().cfx_str().ok_or(AppSW::TxDisplayFail)?;
     let storage_fee_with_unit = format!("{} CFX", storage_fee_str);
     if tx.max_storage_fee() > U256::zero() {
@@ -76,11 +77,14 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
         });
     }
 
+    // If data is not empty, add it to the review fields
     let data_str = format!("0x{}", hex::encode(tx.data.clone()).to_uppercase());
-    my_fields.push(Field {
-        name: "Data",
-        value: data_str.as_str(),
-    });
+    if !tx.data.is_empty() {
+        my_fields.push(Field {
+            name: "Data",
+            value: data_str.as_str(),
+        });
+    }
 
     let settings: Settings = Default::default();
 
@@ -94,6 +98,13 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
             clear_screen();
             warning.place_and_wait();
             return Ok(false);
+        }
+
+        if !fully_decoded {
+            // show warning
+            let warning = Page::from((["Blind", "Signing"], &WARNING));
+            clear_screen();
+            warning.place_and_wait();
         }
 
         let my_review = MultiFieldReview::new(
@@ -136,7 +147,7 @@ pub fn ui_display_tx(tx: &Transaction) -> Result<bool, AppSW> {
         }
 
         // If second setting switch is disabled do not display the transaction data
-        if settings.get_element(1)? == 0 {
+        if settings.get_element(1)? == 0 && !tx.data.is_empty() {
             let field_len = my_fields.len() - 1;
             Ok(review.show(&my_fields[0..field_len]))
         } else {
