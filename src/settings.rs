@@ -21,13 +21,15 @@ impl Settings {
     #[inline(never)]
     #[allow(unused)]
     pub fn get_mut(&mut self) -> &mut AtomicStorage<[u8; SETTINGS_SIZE]> {
-        unsafe { DATA.get_mut() }
+        let data = &raw mut DATA;
+        unsafe { (*data).get_mut() }
     }
 
     #[inline(never)]
     #[allow(unused)]
     pub fn get_ref(&mut self) -> &AtomicStorage<[u8; SETTINGS_SIZE]> {
-        unsafe { DATA.get_ref() }
+        let data = &raw const DATA;
+        unsafe { (*data).get_ref() }
     }
 
     #[allow(unused)]
@@ -35,7 +37,8 @@ impl Settings {
         if index >= SETTINGS_SIZE {
             return Err(AppSW::InternalError);
         }
-        let storage = unsafe { DATA.get_ref() };
+        let data = &raw const DATA;
+        let storage = unsafe { (*data).get_ref() };
         let settings = storage.get_ref();
         Ok(settings[index])
     }
@@ -46,7 +49,8 @@ impl Settings {
         if index >= SETTINGS_SIZE {
             return Err(AppSW::InternalError);
         }
-        let storage = unsafe { DATA.get_mut() };
+        let data = &raw mut DATA;
+        let storage = unsafe { (*data).get_mut() };
         let mut updated_data = *storage.get_ref();
         updated_data[index] = value;
         storage.update(&updated_data);
