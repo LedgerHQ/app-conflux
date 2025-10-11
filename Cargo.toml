@@ -25,8 +25,7 @@ lto = true
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
 
 [features]
-default = ["pending_review_screen"]
-pending_review_screen = []
+default = []
 
 [package.metadata.ledger]
 curve = ["secp256k1"]
