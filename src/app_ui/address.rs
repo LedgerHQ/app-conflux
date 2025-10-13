@@ -63,7 +63,7 @@ pub fn ui_display_pk(addr: &[u8], chain_id: u32) -> Result<bool, AppSW> {
         // Display the address confirmation screen.
         Ok(NbglAddressReview::new()
             .glyph(&CFX)
-            .verify_str("Verify CFX address")
+            .review_title("Verify CFX address")
             .show(&cfx_addr))
     }
 }
