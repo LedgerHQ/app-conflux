@@ -111,7 +111,10 @@ pub fn ui_menu_main(comm: &mut Comm) -> Event<Instruction> {
 #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
 pub fn ui_menu_main(_: &mut Comm) -> NbglHomeAndSettings {
     // Load glyph from 64x64 4bpp gif file with include_gif macro. Creates an NBGL compatible glyph.
+    #[cfg(any(target_os = "stax", target_os = "flex"))]
     const CFX: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
+    #[cfg(target_os = "apex_p")]
+    const CFX: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_48.png", NBGL));
 
     let settings_strings = [
         ["Blind Signing", "Enable transaction blind signing."],
