@@ -43,11 +43,8 @@ use handlers::{
     sign_tx::{handler_sign_tx, TxContext},
 };
 use ledger_device_sdk::io::{ApduHeader, Comm, Reply, StatusWords};
-#[cfg(feature = "pending_review_screen")]
-#[cfg(not(any(target_os = "stax", target_os = "flex")))]
-use ledger_device_sdk::ui::gadgets::display_pending_review;
 
-#[cfg(not(any(target_os = "stax", target_os = "flex")))]
+#[cfg(any(target_os = "nanosplus", target_os = "nanox"))]
 use ledger_device_sdk::io::Event;
 
 ledger_device_sdk::set_panic!(ledger_device_sdk::exiting_panic);
@@ -55,7 +52,7 @@ ledger_device_sdk::set_panic!(ledger_device_sdk::exiting_panic);
 // Required for using String, Vec, format!...
 extern crate alloc;
 
-#[cfg(any(target_os = "stax", target_os = "flex"))]
+#[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
 use ledger_device_sdk::nbgl::{init_comm, NbglReviewStatus, StatusType};
 
 // P2 for last APDU to receive.
@@ -154,7 +151,7 @@ impl TryFrom<ApduHeader> for Instruction {
     }
 }
 
-#[cfg(any(target_os = "stax", target_os = "flex"))]
+#[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
 fn show_status_and_home_if_needed(ins: &Instruction, tx_ctx: &mut TxContext, status: &AppSW) {
     let (show_status, status_type) = match (ins, status) {
         (
@@ -190,7 +187,7 @@ extern "C" fn sample_main() {
 
     let mut tx_ctx = TxContext::new();
 
-    #[cfg(any(target_os = "stax", target_os = "flex"))]
+    #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
     {
         // Initialize reference to Comm instance for NBGL
         // API calls.
@@ -199,15 +196,11 @@ extern "C" fn sample_main() {
         tx_ctx.home.show_and_return();
     }
 
-    #[cfg(not(any(target_os = "stax", target_os = "flex")))]
-    #[cfg(feature = "pending_review_screen")]
-    display_pending_review(&mut comm);
-
     loop {
-        #[cfg(any(target_os = "stax", target_os = "flex"))]
+        #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
         let ins: Instruction = comm.next_command();
 
-        #[cfg(not(any(target_os = "stax", target_os = "flex")))]
+        #[cfg(any(target_os = "nanosplus", target_os = "nanox"))]
         let ins = if let Event::Command(ins) = ui_menu_main(&mut comm) {
             ins
         } else {
@@ -224,7 +217,7 @@ extern "C" fn sample_main() {
                 sw
             }
         };
-        #[cfg(any(target_os = "stax", target_os = "flex"))]
+        #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
         show_status_and_home_if_needed(&ins, &mut tx_ctx, &_status);
     }
 }

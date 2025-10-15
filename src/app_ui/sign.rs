@@ -20,15 +20,15 @@ use crate::settings::Settings;
 use crate::types::{Transaction, U256};
 use crate::AppSW;
 
-#[cfg(not(any(target_os = "stax", target_os = "flex")))]
+#[cfg(any(target_os = "nanosplus", target_os = "nanox"))]
 use ledger_device_sdk::ui::{
     bitmaps::{CROSSMARK, EYE, VALIDATE_14, WARNING},
     gadgets::{clear_screen, Field, MultiFieldReview, Page},
 };
 
-#[cfg(any(target_os = "stax", target_os = "flex"))]
+#[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
 use include_gif::include_gif;
-#[cfg(any(target_os = "stax", target_os = "flex"))]
+#[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
 use ledger_device_sdk::nbgl::{Field, NbglChoice, NbglGlyph, NbglReview, PageIndex};
 
 use alloc::{format, vec};
@@ -91,7 +91,7 @@ pub fn ui_display_tx(tx: &Transaction, ctx: &mut TxContext) -> Result<bool, AppS
     let settings: Settings = Default::default();
 
     // Create transaction review
-    #[cfg(not(any(target_os = "stax", target_os = "flex")))]
+    #[cfg(any(target_os = "nanosplus", target_os = "nanox"))]
     {
         if !fully_decoded && settings.get_element(0)? == 0 {
             // show warning and return
@@ -121,7 +121,7 @@ pub fn ui_display_tx(tx: &Transaction, ctx: &mut TxContext) -> Result<bool, AppS
         Ok(my_review.show())
     }
 
-    #[cfg(any(target_os = "stax", target_os = "flex"))]
+    #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
     {
         if !fully_decoded && settings.get_element(0)? == 0 {
             let confirmed = NbglChoice::new().show(
@@ -140,7 +140,10 @@ pub fn ui_display_tx(tx: &Transaction, ctx: &mut TxContext) -> Result<bool, AppS
             ctx.home.set_start_page(PageIndex::Home);
         }
         // Load glyph from 64x64 4bpp gif file with include_gif macro. Creates an NBGL compatible glyph.
+        #[cfg(any(target_os = "stax", target_os = "flex"))]
         const CFX: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_64.gif", NBGL));
+        #[cfg(target_os = "apex_p")]
+        const CFX: NbglGlyph = NbglGlyph::from_include(include_gif!("icons/cfx_48.png", NBGL));
         // Create NBGL review. Maximum number of fields and string buffer length can be customised
         // with constant generic parameters of NbglReview. Default values are 32 and 1024 respectively.
         let mut review: NbglReview = NbglReview::new()
