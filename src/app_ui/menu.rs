@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *****************************************************************************/
-use include_gif::include_gif;
+use ledger_device_sdk::include_gif;
 use ledger_device_sdk::io::Comm;
 
 #[cfg(any(target_os = "nanosplus", target_os = "nanox"))]

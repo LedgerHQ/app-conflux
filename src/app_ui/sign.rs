@@ -27,7 +27,7 @@ use ledger_device_sdk::ui::{
 };
 
 #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
-use include_gif::include_gif;
+use ledger_device_sdk::include_gif;
 #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
 use ledger_device_sdk::nbgl::{Field, NbglChoice, NbglGlyph, NbglReview, PageIndex};
 
