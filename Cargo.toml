@@ -1,11 +1,11 @@
 [package]
 name = "conflux"
-version = "2.2.0"
+version = "2.2.1"
 authors = ["Conflux Foundation"]
 edition = "2021"
 
 [dependencies]
-ledger_device_sdk = "1.28.0"
+ledger_device_sdk = "1.29.0"
 hex = { version = "0.4.3", default-features = false, features = ["serde", "alloc"] }
 # numtoa = "0.2.4"
 k256 = { version = "0.13.4", default-features = false, features = ["ecdsa"] }
@@ -46,6 +46,3 @@ icon = "icons/cfx_32.png"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("apex_p", "stax", "flex", "nanos", "nanox", "nanosplus"))'] }
-
-[patch.crates-io]
-ledger_device_sdk = {path = "../ledger-device-rust-sdk/ledger_device_sdk" }
