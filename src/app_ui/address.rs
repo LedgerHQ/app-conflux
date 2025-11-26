@@ -29,7 +29,7 @@ use ledger_device_sdk::ui::{
 use ledger_device_sdk::nbgl::{NbglAddressReview, NbglGlyph};
 
 #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
-use include_gif::include_gif;
+use ledger_device_sdk::include_gif;
 
 pub fn ui_display_pk(addr: &[u8], chain_id: u32) -> Result<bool, AppSW> {
     let addr = &addr[addr.len() - ADDRRESS_BYTES_LEN..]; // last 20 bytes
