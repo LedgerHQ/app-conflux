@@ -1,3 +1,5 @@
+#![allow(clippy::manual_div_ceil)]
+
 use crate::consts::{ADDRRESS_BYTES_LEN, EXPONENT_SMALLEST_UNIT, HASH_BYTES_LEN};
 use alloc::string::{String, ToString};
 use bigdecimal::{BigDecimal, FromPrimitive};
@@ -34,6 +36,7 @@ impl Decodable for U256 {
         })
     }
 }
+
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct H256(pub [u8; HASH_BYTES_LEN]);
