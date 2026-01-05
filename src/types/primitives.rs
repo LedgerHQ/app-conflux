@@ -37,7 +37,6 @@ impl Decodable for U256 {
     }
 }
 
-
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct H256(pub [u8; HASH_BYTES_LEN]);
 
