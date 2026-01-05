@@ -26,8 +26,8 @@ pub struct Transaction {
 
 impl Transaction {
     pub fn max_gas_fee(&self) -> U256 {
-        if self.gas_price.is_some() {
-            self.gas_price.unwrap() * U256::from(self.gas)
+        if let Some(gas_price) = self.gas_price {
+            gas_price * U256::from(self.gas)
         } else {
             self.max_fee_per_gas.unwrap() * U256::from(self.gas)
         }
