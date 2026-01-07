@@ -1,12 +1,11 @@
 [package]
 name = "conflux"
-version = "2.2.0"
+version = "2.2.2"
 authors = ["Conflux Foundation"]
 edition = "2021"
 
 [dependencies]
-ledger_device_sdk = "1.27.2"
-include_gif = "1.2.4"
+ledger_device_sdk = "1.30.0"
 hex = { version = "0.4.3", default-features = false, features = ["serde", "alloc"] }
 # numtoa = "0.2.4"
 k256 = { version = "0.13.4", default-features = false, features = ["ecdsa"] }
