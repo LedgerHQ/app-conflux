@@ -5,11 +5,14 @@ from sha3 import keccak_256
 from ecdsa.curves import SECP256k1
 from ecdsa.keys import VerifyingKey
 from ecdsa.util import sigdecode_der, sigdecode_string
+from eth_account import Account
+from eth_account.messages import encode_defunct, encode_typed_data
 
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
-PREFIX = b"\x19Conflux Signed Message:\n"
+PREFIX = b"\x19Ethereum Signed Message:\n"
+CONFLUX_PREFIX = b"\x19Conflux Signed Message:\n"
 
 # Check if a des signature of a given message is valid
 def check_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
@@ -48,3 +51,23 @@ def check_rs_prefix_msg_signature_validity(public_key: bytes, signature: bytes, 
                      data=message,
                      hashfunc=keccak_256,
                      sigdecode=sigdecode_string)
+    
+def check_rs_cfx_prefix_msg_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
+    pk: VerifyingKey = VerifyingKey.from_string(
+        public_key,
+        curve=SECP256k1,
+        hashfunc=sha256
+    )
+    message = CONFLUX_PREFIX + str(len(message)).encode() + message
+    return pk.verify(signature=signature,
+                     data=message,
+                     hashfunc=keccak_256,
+                     sigdecode=sigdecode_string)
+
+def recover_message(msg, vrs: tuple[int, int, int]) -> bytes:
+    if isinstance(msg, dict):  # EIP-712
+        smsg = encode_typed_data(full_message=msg)
+    else:  # EIP-191
+        smsg = encode_defunct(primitive=msg)
+    addr = Account.recover_message(smsg, vrs)
+    return bytes.fromhex(addr[2:])

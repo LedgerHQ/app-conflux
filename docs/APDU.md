@@ -55,6 +55,18 @@ Status words tend to be similar to common [APDU responses](https://www.eftlab.co
 
 ## Commands
 
+The currently supported commands are as follows::
+
+| INS    | Name   |    |
+| ------ | ------ |----|
+| `0x01` | GET_APP_INFO |    |
+| `0x02` | GET_PUBLIC_ADDRESS |    |
+| `0x03` | SIGN_TRANSACTION |    |
+| `0x04` | SIGN_PERSONAL_MESSAGE |    |
+| `0x0A` | SIGN_EIP712 |    |
+| `0x0B` | EIP712_SEND_STRUCT_DEFINITION |    |
+| `0x0C` | EIP712_SEND_STRUCT_IMPLEMENTATION |    |
+
 ### GET_APP_INFO
 
 #### Request format
@@ -231,3 +243,315 @@ Subsequent data blocks:
 ```
 
 **Response**: `00 f9071161c2dbc19dabf54d14d42944cecacf61943a9898f4f64c8aa6d23a58b6 64ea364f092d23d7a94388f2f43cf54a86fe644d221e822210fde413d406ebb6 9000`
+
+### PERSONAL_SIGN
+
+This command can be used to sign Conflux version personal message, check details at [here](https://github.com/Conflux-Chain/CIPs/blob/master/CIPs/cip-23.md)
+This command has been supported since app version 2.3.0
+
+#### Request format
+
+| CLA  | INS  | P1                                      | P2   | Lc       | Le       |
+| ---- | ---- | --------------------------------------- | ---- | -------- | -------- |
+| `e0` | `04` | `00`: first data block      | `80` more | variable | variable |
+|      |      | `01`-`20`: subsequent data block index |  `00` last    |          |          |
+
+##### Request payload
+
+First data block:
+
+| Description                                      | Length |
+| ------------------------------------------------ | ------ |
+| Number of BIP 32 derivations to perform (max 10) | 1      |
+| First derivation index (big endian)              | 4      |
+| ...                                              | 4      |
+| Last derivation index (big endian)               | 4      |
+
+Subsequent data blocks:
+
+| Description    | Length |
+| -------------- | ------ |
+| Message data chunk | var    |
+
+#### **Response** format
+
+| Description | Length |
+| ----------- | ------ |
+| v           | 1      |
+| r           | 32     |
+| s           | 32     |
+
+#### Examples
+
+**Command**: `e004008015058000002c800001f7800000000000000000000000`
+
+| CLA    | INS    | P1     | P2     | Lc     | Le                                                                                                                                                       |
+| ------ | ------ | ------ | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0xe0` | `0x04` | `0x00` | `0x80` | `0x15` | `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000` |
+
+`44'/503'/0'/0/0` is encoded as `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000`.
+
+**Command**: `e0040100c48656c6c6f2c20576f726c64`
+
+| CLA    | INS    | P1     | P2     | Lc     | Le                                                                          |
+| ------ | ------ | ------ | ------ | ------ | ----------------------------------------------------------------------------|
+| `0xe0` | `0x04` | `0x01` | `0x00` | `0xc` | `0x48656c6c6f2c20576f726c64` |
+
+`0x48656c6c6f2c20576f726c64` is the message "Hello, World" in hex.
+
+### ETH PERSONAL_SIGN
+
+This command is identical to EIP191, has been supported since app version 2.3.0
+
+#### Request format
+
+| CLA  | INS  | P1                                      | P2   | Lc       | Le       |
+| ---- | ---- | --------------------------------------- | ---- | -------- | -------- |
+| `e0` | `07` | `00`: first data block      | `80` more | variable | variable |
+|      |      | `01`-`20`: subsequent data block index |  `00` last    |          |          |
+
+##### Request payload
+
+First data block:
+
+| Description                                      | Length |
+| ------------------------------------------------ | ------ |
+| Number of BIP 32 derivations to perform (max 10) | 1      |
+| First derivation index (big endian)              | 4      |
+| ...                                              | 4      |
+| Last derivation index (big endian)               | 4      |
+
+Subsequent data blocks:
+
+| Description    | Length |
+| -------------- | ------ |
+| Message data chunk | var    |
+
+#### **Response** format
+
+| Description | Length |
+| ----------- | ------ |
+| v           | 1      |
+| r           | 32     |
+| s           | 32     |
+
+#### Examples
+
+**Command**: `e004008015058000002c800001f7800000000000000000000000`
+
+| CLA    | INS    | P1     | P2     | Lc     | Le                                                                                                                                                       |
+| ------ | ------ | ------ | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0xe0` | `0x07` | `0x00` | `0x80` | `0x15` | `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000` |
+
+`44'/503'/0'/0/0` is encoded as `0x05 0x8000002c 0x800001f7 0x80000000 0x00000000 0x00000000`.
+
+**Command**: `e0040100c48656c6c6f2c20576f726c64`
+
+| CLA    | INS    | P1     | P2     | Lc     | Le                                                                          |
+| ------ | ------ | ------ | ------ | ------ | ----------------------------------------------------------------------------|
+| `0xe0` | `0x07` | `0x01` | `0x00` | `0xc` | `0x48656c6c6f2c20576f726c64` |
+
+`0x48656c6c6f2c20576f726c64` is the message "Hello, World" in hex.
+
+### SIGN ETH EIP 712
+
+#### Description
+
+This command signs an Ethereum message following the EIP 712 specification (https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md)
+
+And also support Conflux version EIP712 signing - [CIP23](https://github.com/Conflux-Chain/CIPs/blob/master/CIPs/cip-23.md).
+
+This command has been supported since app version 2.3.0
+
+The full implementation uses all the JSON data and does all the hashing on the
+device. This command should come last, after all the EIP712 SEND STRUCT DEFINITION & SEND STRUCT IMPLEMENTATION.
+
+#### Coding
+
+_Command_
+
+
+
+| *CLA* | *INS*  | *P1*               | *P2*       | *Lc*     | *Le* |
+| ------ | ------ | ------ | ------ | ------ | ---------------------|
+|   E0  |   0A   |  00 | 01: full implementation | variable | variable |
+
+
+_Input data_
+
+| Description                                      | Length |
+| ------------------------------------------------ | ------ |
+| Number of BIP 32 derivations to perform (max 10) | 1      |
+| First derivation index (big endian)              | 4      |
+| ...                                              | 4      |
+| Last derivation index (big endian)               | 4      |
+
+
+**Response** format
+
+| Description | Length |
+| ----------- | ------ |
+| v           | 1      |
+| r           | 32     |
+| s           | 32     |
+
+### EIP712 SEND STRUCT DEFINITION
+
+#### Description
+
+This command sends the message definition with all its types. +
+These commands should come before the EIP712 SEND STRUCT IMPLEMENTATION ones.
+
+#### Coding
+
+_Command_
+
+
+| *CLA* | *INS*  | *P1*               | *P2*       | *LC*     | *Le* |
+| ------ | ------ | ------ | ------ | ------ | ---------------------|
+|   E0  |   0B   |  00 |   00 : struct name <br> FF : struct field| variable | variable |
+
+_Input data_
+
+##### If P2 == struct name
+
+
+| *Description*         | *Length (byte)* |
+| ---- | ----|
+| Name                  | LC |
+
+
+##### If P2 == struct field
+
+| *Description*                     | *Length (byte)*   | *Mandatory*|
+| ------ | ------ | ------ |
+| TypeDesc (type description)       | 1                 | ✅|
+| TypeNameLength                    | 1                 | ❌|
+| TypeName                          | variable          | ❌|
+| TypeSize                          | 1                 | ❌|
+| ArrayLevelCount                   | 1                 | ❌|
+| ArrayLevels                       | variable          | ❌|
+| KeyNameLength                     | 1                 | ✅|
+| KeyName                           | variable          | ✅|
+
+
+###### TypeDesc
+
+From MSB to LSB:
+
+
+| *Description*                             | *Length (bit)* |
+| ----- | ------ |
+| TypeArray (is it an array?)               | 1 |
+| TypeSize (is a type size specified?)      | 1 |
+| Unused                                    | 2 |
+| Type                                      | 4 |
+
+
+How to interpret Type from its value :
+
+
+| *Value*           | *Type* |
+| ----- | ------ |
+| 0                 | custom (struct type) |
+| 1                 | int|
+| 2                 | uint|
+| 3                 | address|
+| 4                 | bool|
+| 5                 | string|
+| 6                 | fixed-sized bytes|
+| 7                 | dynamic-sized bytes|
+
+
+###### TypeName
+
+_Only present if the Type is set to custom._
+
+Indicates the name of the struct that will be the type of the field.
+
+
+###### TypeSize
+
+_Only present if the TypeSize bit is set in TypeDesc._
+
+Indicates the byte size of the field. (Ex: 8 for an int64)
+
+
+###### ArrayLevelCount
+
+_Only present if the TypeArray bit is set in TypeDesc._
+
+Indicates how many array levels that field has (Ex: 3 for int16[2][][4]).
+
+###### ArrayLevels
+
+_Only present if the TypeArray bit is set in TypeDesc._
+
+Types of array level:
+
+| *Byte value*  | *Type* |
+| ---- | --- |
+| 0             | Dynamic sized (type[]) |
+| 1             | Fixed size (type[N]) |
+
+Each fixed-sized array level is followed by a byte indicating its size (number of elements).
+
+_Output data_
+
+None
+
+### EIP712 SEND STRUCT IMPLEMENTATION
+
+#### Description
+
+This command sends the message implementation with all its values.
+These commands should come after the EIP712 SEND STRUCT DEFINITION ones.
+
+#### Coding
+
+_Command_
+
+
+| *CLA* | *INS*  | *P1*               | *P2*       | *LC*     | *Le* |
+| ------ | ------ | ------ | ------ | ------ | ---------------------|
+|   E0  |   0C   |  00 : complete send <br> 01 : partial send, more to come |   00 : root struct <br> 0F : array<br> FF : struct field | variable | variable |
+
+
+_Input data_
+
+##### If P2 == root struct
+
+
+| *Description*         | *Length (byte)* |
+| ---- | ---- |
+| Name                  | LC |
+
+Sets the name of the upcoming root structure all the following fields will be apart
+of until we set another root structure.
+
+##### If P2 == array
+
+| *Description*         | *Length (byte)* |
+| ---- | ---- |
+| Array size            | 1 |
+
+
+Sets the size of the upcoming array the following N fields will be apart of.
+
+##### If P2 == struct field
+
+
+| *Description*         | *Length (byte)* |
+| ---- | ---- |
+| Value length          | 2 (BE) |
+| Value                 | variable |
+
+
+Sets the raw value of the next field in order in the current root structure.
+Raw as in, an integer in the JSON file represented as "128" would only be 1 byte long (0x80)
+instead of 3 as an array of ASCII characters, same for addresses and so on.
+
+
+_Output data_
+
+None

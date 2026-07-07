@@ -14,59 +14,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *****************************************************************************/
-use crate::app_ui::sign::ui_display_tx;
-use crate::consts::MAX_TRANSACTION_LEN;
-use crate::crypto::decode_der_sig;
-use crate::types::Transaction;
-use crate::utils::Bip32Path;
-use crate::AppSW;
-use alloc::vec::Vec;
-use ledger_device_sdk::ecc::{Secp256k1, SeedDerive};
-use ledger_device_sdk::hash::{sha3::Keccak256, HashInit};
+use crate::{
+    app_ui::sign::ui_display_tx,
+    consts::MAX_TRANSACTION_LEN,
+    handlers::{common::Context, hash_sign_and_send},
+    types::Transaction,
+    AppSW,
+};
+use alloy_rlp::Decodable;
 use ledger_device_sdk::io::Comm;
-use rlp_decoder::decode;
-
-#[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
-use ledger_device_sdk::nbgl::NbglHomeAndSettings;
-
-pub struct TxContext {
-    pub raw_tx: Vec<u8>,
-    pub path: Bip32Path,
-    pub review_finished: bool,
-    #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
-    pub home: NbglHomeAndSettings,
-}
-
-// Implement constructor for TxInfo with default values
-impl TxContext {
-    // Constructor
-    pub fn new() -> TxContext {
-        TxContext {
-            raw_tx: Vec::new(),
-            path: Default::default(),
-            review_finished: false,
-            #[cfg(any(target_os = "stax", target_os = "flex", target_os = "apex_p"))]
-            home: Default::default(),
-        }
-    }
-    // Get review status
-    #[allow(dead_code)]
-    pub fn finished(&self) -> bool {
-        self.review_finished
-    }
-    // Implement reset for TxInfo
-    pub fn reset(&mut self) {
-        self.raw_tx.clear();
-        self.path = Default::default();
-        self.review_finished = false;
-    }
-}
 
 pub fn handler_sign_tx(
     comm: &mut Comm,
     chunk: u8,
     more: bool,
-    ctx: &mut TxContext,
+    ctx: &mut Context,
 ) -> Result<(), AppSW> {
     // Try to get data from comm
     let data = comm.get_data().map_err(|_| AppSW::WrongApduLength)?;
@@ -94,39 +56,17 @@ pub fn handler_sign_tx(
         // Otherwise, try to parse the transaction
         } else {
             // Try to deserialize the transaction
-            let tx: Transaction =
-                decode(ctx.raw_tx.as_slice()).map_err(|_| AppSW::TxParsingFail)?;
+            let tx = Transaction::decode(&mut ctx.raw_tx.as_slice())
+                .map_err(|_| AppSW::TxParsingFail)?;
             // Display transaction. If user approves
             // the transaction, sign it. Otherwise,
             // return a "deny" status word.
+            ctx.review_finished = true;
             if ui_display_tx(&tx, ctx)? {
-                ctx.review_finished = true;
-                compute_signature_and_append(comm, ctx)
+                hash_sign_and_send(comm, &ctx.path, &ctx.raw_tx)
             } else {
-                ctx.review_finished = true;
                 Err(AppSW::Deny)
             }
         }
     }
-}
-
-fn compute_signature_and_append(comm: &mut Comm, ctx: &mut TxContext) -> Result<(), AppSW> {
-    let mut keccak256 = Keccak256::new();
-    let mut message_hash: [u8; 32] = [0u8; 32];
-
-    let _ = keccak256.hash(&ctx.raw_tx, &mut message_hash);
-
-    let (sig, siglen, parity) = Secp256k1::derive_from_path(ctx.path.as_ref())
-        .deterministic_sign(&message_hash)
-        .map_err(|_| AppSW::TxSignFail)?;
-
-    let mut r: [u8; 32] = [0u8; 32];
-    let mut s: [u8; 32] = [0u8; 32];
-
-    decode_der_sig(&sig[..siglen as usize], &mut r, &mut s).map_err(|_| AppSW::TxSignFail)?;
-
-    comm.append(&[parity as u8]);
-    comm.append(&r);
-    comm.append(&s);
-    Ok(())
 }
